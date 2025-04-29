@@ -1,0 +1,36 @@
+{
+  "name": "solrpc",
+  "version": "0.0.1",
+  "description": "Solana RPC Aggregator",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm test",
+    "start:dev": "nodemon",
+    "dev": "npm run start:dev",
+    "start": "node ./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xRadioAc7iv/solrpc.git"
+  },
+  "keywords": [
+    "rpc",
+    "solana",
+    "load-balancing",
+    "rpc-aggregator"
+  ],
+  "author": "Manav Gadhiya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/0xRadioAc7iv/solrpc/issues"
+  },
+  "homepage": "https://github.com/0xRadioAc7iv/solrpc#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "nodemon": "^3.1.10"
+  }
+}
