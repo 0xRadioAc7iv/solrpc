@@ -1,15 +1,19 @@
-import express from "express";
+import Fastify from "fastify";
+import { setActiveRPCEndpoints } from "./utils";
+import { ACTIVE_NETWORK } from "./config";
 
-const app = express();
+const app = Fastify({ logger: true });
 
-app.use("/", (request, response) => {
-  response.sendStatus(200);
+const ACTIVE_ENDPOINTS = setActiveRPCEndpoints(ACTIVE_NETWORK);
+
+app.get("/", (request, reply) => {
+  reply.code(200).send();
 });
 
-app.use("/check", (_, response) => {
-  response.sendStatus(200);
+app.get("/check", (_, reply) => {
+  reply.code(200).send();
 });
 
-app.listen(process.argv[2] || 9000, () => {
+app.listen({ port: (process.argv[2] as unknown as number) || 9000 }, () => {
   console.log("Server is listening...");
 });
