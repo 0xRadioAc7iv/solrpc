@@ -1,17 +1,20 @@
 import Fastify from "fastify";
-import { setActiveRPCEndpoints } from "./utils";
-import { ACTIVE_NETWORK } from "./config";
+import { validateRequestBody } from "./middlewares/validation";
+import { requestHandler } from "./handler";
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: false });
 
-const ACTIVE_ENDPOINTS = setActiveRPCEndpoints(ACTIVE_NETWORK);
+app.register((fastify, opts, done) => {
+  fastify.post("/", {
+    preHandler: validateRequestBody,
+    handler: requestHandler,
+  });
 
-app.get("/", (request, reply) => {
-  reply.code(200).send();
-});
+  fastify.get("/check", (_, reply) => {
+    reply.code(200).send({ status: "ok" });
+  });
 
-app.get("/check", (_, reply) => {
-  reply.code(200).send();
+  done();
 });
 
 app.listen({ port: (process.argv[2] as unknown as number) || 9000 }, () => {
