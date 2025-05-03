@@ -8,4 +8,5 @@ bootstrapServer({
     devnet: ["https://api.devnet.solana.com"],
     mainnet: ["https://api.mainnet-beta.solana.com"],
   },
+  cachingMethod: "memory",
 });

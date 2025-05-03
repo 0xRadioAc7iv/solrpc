@@ -2,11 +2,13 @@ import Fastify from "fastify";
 import { ServerOptions, ValidRequestBody } from "../../types";
 import { validateRequestBody } from "../utils/validate";
 import { LeastConnectionsBalancer } from "../core/balancing";
+import { handleRequest } from "../utils/requestHandler";
+import { getCachePolicyForMethod } from "../utils/cachePolicy";
 
 const httpServer = Fastify({ logger: true });
 
-export async function initHTTPServer({ balancer }: ServerOptions) {
-  httpServer.register((fastify, opts, done) => {
+export async function initHTTPServer({ balancer, cache }: ServerOptions) {
+  httpServer.register((fastify, _, done) => {
     fastify.post("/", {
       preHandler: validateRequestBody,
       handler: async (request, reply) => {
@@ -14,16 +16,29 @@ export async function initHTTPServer({ balancer }: ServerOptions) {
           const requestBody = request.body as ValidRequestBody;
           const body = { jsonrpc: "2.0", ...requestBody };
 
+          const policy = getCachePolicyForMethod(body.method);
+
+          // ✅ Try to serve from cache
+          if (policy.cacheable) {
+            const cached = cache.get(body.method, body.params);
+            if (cached) {
+              reply.code(200).send(JSON.parse(cached));
+              return;
+            }
+          }
+
           const nextEndpoint = balancer.getEndpoint();
-
-          const response = await fetch(nextEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          });
-
-          const jsonResponse = await response.json();
+          const jsonResponse = await handleRequest(nextEndpoint, body);
           reply.code(200).send(jsonResponse);
+
+          if (policy.cacheable) {
+            cache.set(
+              body.method,
+              body.params,
+              JSON.stringify(jsonResponse),
+              policy.ttlMs
+            );
+          }
 
           if (balancer instanceof LeastConnectionsBalancer) {
             balancer.releaseEndpoint(nextEndpoint);
