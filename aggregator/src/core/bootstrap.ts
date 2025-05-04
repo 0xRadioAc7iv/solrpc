@@ -9,6 +9,7 @@ export async function bootstrapServer({
   balancingMethod,
   endpoints,
   cachingMethod,
+  port,
 }: ConfigOptions) {
   const configuredEndpoints =
     network === "devnet" ? endpoints.devnet : endpoints.mainnet;
@@ -20,7 +21,7 @@ export async function bootstrapServer({
   const balancer = createBalancer(balancingMethod, configuredEndpoints);
   const cache = createCache(cachingMethod);
 
-  if (transport === "http") await initHTTPServer({ balancer, cache });
+  if (transport === "http") await initHTTPServer({ balancer, cache, port });
   //   else if (transport === "ws") await initWebSocketServer();
   //   else {
   //     await initHttpServer();

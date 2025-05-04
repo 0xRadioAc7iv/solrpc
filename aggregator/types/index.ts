@@ -1,11 +1,15 @@
-import { MemoryCache } from "../src/core/caching";
+import { MemoryCache, RedisCache } from "../src/core/caching";
 import { Balancer } from "../src/lib/interfaces";
 
 type TransportOptions = "http" | "ws" | "both";
 
 type NetworkOptions = "devnet" | "mainnet-beta";
 
-export type CachingMethods = "memory";
+type CacheMemory = { type: "memory" };
+
+type CacheRedis = { type: "redis"; url: string };
+
+export type CachingMethods = CacheMemory | CacheRedis;
 
 export type CacheEntry = {
   value: string;
@@ -24,12 +28,16 @@ export type CachePolicy =
 
 export type LoadBalancingOptions = "round-robin" | "least-connections";
 
+export type Cache = MemoryCache | RedisCache;
+
 export type ServerOptions = {
   balancer: Balancer;
-  cache: MemoryCache;
+  cache: Cache;
+  port: number | undefined;
 };
 
 export type ValidRequestBody = {
+  jsonrpc: "2.0";
   id: number;
   method: string;
   params: any;
@@ -44,4 +52,5 @@ export type ConfigOptions = {
     mainnet: string[];
   };
   cachingMethod: CachingMethods;
+  port?: number;
 };

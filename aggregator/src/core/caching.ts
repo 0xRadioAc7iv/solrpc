@@ -1,10 +1,10 @@
 import crypto from "crypto";
 import { CacheEntry, CachingMethods } from "../../types";
-import { Cache } from "../lib/interfaces";
+import Redis from "ioredis";
 
 export function createCache(cacheMethod: CachingMethods) {
-  //   if (cacheMethod === "memory") return new MemoryCache();
-  return new MemoryCache();
+  if (cacheMethod.type === "memory") return new MemoryCache();
+  else return new RedisCache(cacheMethod.url);
 }
 
 export class MemoryCache {
@@ -38,5 +38,34 @@ export class MemoryCache {
     const key = this.generateKey(method, params);
     const expiresAt = Date.now() + ttlMs;
     this.cache.set(key, { value: response, expiresAt });
+  }
+}
+
+export class RedisCache {
+  private redis: Redis;
+
+  constructor(url: string) {
+    this.redis = new Redis(url);
+  }
+
+  private generateKey(method: string, params: string): string {
+    const rawKey = `${method}:${params}`;
+    return crypto.createHash("sha256").update(rawKey).digest("hex");
+  }
+
+  async get(method: string, params: string): Promise<string | undefined> {
+    const key = this.generateKey(method, params);
+    const value = await this.redis.get(key);
+    return value ?? undefined;
+  }
+
+  async set(
+    method: string,
+    params: string,
+    response: string,
+    ttlMs: number
+  ): Promise<void> {
+    const key = this.generateKey(method, params);
+    await this.redis.set(key, response, "PX", ttlMs);
   }
 }
