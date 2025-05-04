@@ -26,7 +26,10 @@ export type CachePolicy =
       cacheable: false;
     };
 
-export type LoadBalancingOptions = "round-robin" | "least-connections";
+export type LoadBalancingOptions =
+  | "round-robin"
+  | "least-connections"
+  | "least-latency";
 
 export type Cache = MemoryCache | RedisCache;
 
