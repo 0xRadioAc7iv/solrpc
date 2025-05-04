@@ -1,4 +1,4 @@
-import { MemoryCache, RedisCache } from "../src/core/caching";
+import { MemcachedCache, MemoryCache, RedisCache } from "../src/core/caching";
 import { Balancer } from "../src/lib/interfaces";
 
 type TransportOptions = "http" | "ws" | "both";
@@ -9,7 +9,9 @@ type CacheMemory = { type: "memory" };
 
 type CacheRedis = { type: "redis"; url: string };
 
-export type CachingMethods = CacheMemory | CacheRedis;
+type CacheMemcached = { type: "memcached"; url: string };
+
+export type CachingMethods = CacheMemory | CacheRedis | CacheMemcached;
 
 export type CacheEntry = {
   value: string;
@@ -31,7 +33,7 @@ export type LoadBalancingOptions =
   | "least-connections"
   | "least-latency";
 
-export type Cache = MemoryCache | RedisCache;
+export type Cache = MemoryCache | RedisCache | MemcachedCache;
 
 export type ServerOptions = {
   balancer: Balancer;
