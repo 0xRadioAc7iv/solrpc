@@ -9,4 +9,5 @@ bootstrapServer({
     mainnet: ["https://api.mainnet-beta.solana.com"],
   },
   cachingMethod: { type: "memory" },
+  maxRetries: 5,
 });

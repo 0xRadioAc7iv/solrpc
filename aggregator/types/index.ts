@@ -39,6 +39,7 @@ export type ServerOptions = {
   balancer: Balancer;
   cache: Cache;
   port: number | undefined;
+  maxRetries: number;
 };
 
 export type ValidRequestBody = {
@@ -58,4 +59,5 @@ export type ConfigOptions = {
   };
   cachingMethod: CachingMethods;
   port?: number;
+  maxRetries?: number;
 };

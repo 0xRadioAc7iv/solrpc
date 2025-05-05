@@ -1,9 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ServerOptions, ValidRequestBody } from "../../types";
 import { getCachePolicyForMethod } from "./cachePolicy";
-import { LeastConnectionsBalancer } from "../core/balancing";
+import { requestsWithRetry } from "../utils/requestRetry";
 
-export async function handleRequest({ balancer, cache }: ServerOptions) {
+export async function handleRequest({
+  balancer,
+  cache,
+  maxRetries,
+}: ServerOptions) {
   const handler = async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = Date.now();
     let method = "unknown";
@@ -24,10 +28,10 @@ export async function handleRequest({ balancer, cache }: ServerOptions) {
         timestamp: new Date().toISOString(),
       });
 
-      const policy = getCachePolicyForMethod(body.method);
+      const policy = getCachePolicyForMethod(method);
 
       if (policy.cacheable) {
-        const cached = await cache.get(body.method, paramKey);
+        const cached = await cache.get(method, paramKey);
         if (cached) {
           request.log.info({ type: "cache-hit", method, id: requestId });
           reply.code(200).send(JSON.parse(cached));
@@ -37,50 +41,59 @@ export async function handleRequest({ balancer, cache }: ServerOptions) {
         }
       }
 
-      const nextEndpoint = balancer.getEndpoint();
-      const response = await fetch(nextEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+      const { response, error } = await requestsWithRetry({
+        balancer,
+        body,
+        log: request.log,
+        maxRetries,
       });
 
-      if (!response.ok) {
-        throw new Error(`RPC server responded with ${response.status}`);
-      }
+      if (response) {
+        reply.code(200).send(response);
 
-      const jsonResponse = await response.json();
-
-      request.log.info({
-        type: "rpc-forward",
-        id: requestId,
-        to: nextEndpoint,
-        method,
-        status: jsonResponse?.result ? "success" : "error",
-      });
-
-      reply.code(200).send(jsonResponse);
-
-      if (policy.cacheable) {
-        await cache.set(
+        if (policy.cacheable) {
+          await cache.set(
+            method,
+            paramKey,
+            JSON.stringify(response),
+            policy.ttlMs
+          );
+        }
+      } else {
+        request.log.error({
+          type: "rpc-failure",
+          id: requestId,
           method,
-          paramKey,
-          JSON.stringify(jsonResponse),
-          policy.ttlMs
-        );
-      }
+          error,
+        });
 
-      if (balancer instanceof LeastConnectionsBalancer) {
-        balancer.releaseEndpoint(nextEndpoint);
+        reply.code(502).send({
+          jsonrpc: "2.0",
+          id: requestId,
+          error: {
+            code: -32000,
+            message: "Request failed after multiple attempts",
+            data: error,
+          },
+        });
       }
-    } catch (error) {
+    } catch (err: any) {
       request.log.error({
-        type: "rpc-error",
+        type: "rpc-unhandled-error",
         id: requestId,
         method,
-        message: (error as Error)?.message,
-        stack: (error as Error)?.stack,
+        message: err.message,
+        stack: err.stack,
       });
-      reply.code(500).send({ error: "Internal Server Error" });
+
+      reply.code(500).send({
+        jsonrpc: "2.0",
+        id: requestId,
+        error: {
+          code: -32603,
+          message: "Internal Server Error",
+        },
+      });
     } finally {
       const duration = Date.now() - startTime;
       request.log.info({
