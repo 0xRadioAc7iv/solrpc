@@ -7,7 +7,7 @@ export async function handleRequest({ balancer, cache }: ServerOptions) {
   const handler = async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = Date.now();
     let method = "unknown";
-    let requestId: string | number | undefined = undefined;
+    let requestId: number | undefined = undefined;
 
     try {
       const body = request.body as ValidRequestBody;

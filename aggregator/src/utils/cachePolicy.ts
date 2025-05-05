@@ -59,6 +59,8 @@ export function getCachePolicyForMethod(method: string): CachePolicy {
     case "getSignaturesForAddress":
     case "getTokenAccountsByDelegate":
     case "isBlockhashValid":
+    case "getBlockHeight":
+    case "getHighestSnapshotSlot":
       return { cacheable: true, ttlMs: short };
 
     // Non-cacheable methods (mutative or highly dynamic)
