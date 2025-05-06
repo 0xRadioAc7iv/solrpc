@@ -3,7 +3,7 @@ import { Balancer } from "../src/lib/interfaces";
 
 type TransportOptions = "http" | "ws" | "both";
 
-type NetworkOptions = "devnet" | "mainnet-beta";
+export type NetworkOptions = "devnet" | "mainnet";
 
 type CacheMemory = { type: "memory" };
 
@@ -28,12 +28,13 @@ export type CachePolicy =
       cacheable: false;
     };
 
-export type LoadBalancingOptions =
+type LoadBalancingOptions =
   | "round-robin"
   | "least-connections"
-  | "least-latency";
+  | "least-latency"
+  | "weighted";
 
-export type Cache = MemoryCache | RedisCache | MemcachedCache;
+type Cache = MemoryCache | RedisCache | MemcachedCache;
 
 export type ServerOptions = {
   balancer: Balancer;
@@ -49,14 +50,32 @@ export type ValidRequestBody = {
   params: any;
 };
 
-export type ConfigOptions = {
-  transport: TransportOptions;
-  network: NetworkOptions;
-  balancingMethod: LoadBalancingOptions;
+export type WeightedEndpointArray = Array<{ url: string; weight: number }>;
+
+type WeightedBalancingOption = {
+  method: "weighted";
+  endpoints: {
+    devnet: WeightedEndpointArray;
+    mainnet: WeightedEndpointArray;
+  };
+};
+
+type UnweightedBalancingOption = {
+  method: Exclude<LoadBalancingOptions, "weighted">;
   endpoints: {
     devnet: string[];
     mainnet: string[];
   };
+};
+
+export type BalancingOptions =
+  | WeightedBalancingOption
+  | UnweightedBalancingOption;
+
+export type ConfigOptions = {
+  transport: TransportOptions;
+  network: NetworkOptions;
+  balancingOptions: BalancingOptions;
   cachingMethod: CachingMethods;
   port?: number;
   maxRetries?: number;

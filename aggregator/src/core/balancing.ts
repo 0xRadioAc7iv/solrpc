@@ -1,16 +1,35 @@
-import { LoadBalancingOptions } from "../../types";
+import {
+  BalancingOptions,
+  NetworkOptions,
+  WeightedEndpointArray,
+} from "../../types";
 import { Balancer } from "../lib/interfaces";
 
 export function createBalancer(
-  balancingMethod: LoadBalancingOptions,
-  endpoints: string[]
-) {
-  if (balancingMethod === "round-robin") {
-    return new RoundRobinBalancer(endpoints);
-  } else if (balancingMethod === "least-latency") {
-    return new LeastLatencyBalancer(endpoints);
+  balancingOptions: BalancingOptions,
+  network: NetworkOptions
+): Balancer {
+  const { method, endpoints } = balancingOptions;
+
+  if (!endpoints[network]) {
+    throw new Error("No Endpoints Configured!");
+  }
+
+  if (method === "weighted") {
+    const weightedEndpoints = endpoints[network];
+    return new WeightedBalancer(weightedEndpoints);
   } else {
-    return new LeastConnectionsBalancer(endpoints);
+    const unweightedEndpoints = endpoints[network];
+    switch (method) {
+      case "round-robin":
+        return new RoundRobinBalancer(unweightedEndpoints);
+      case "least-connections":
+        return new LeastConnectionsBalancer(unweightedEndpoints);
+      case "least-latency":
+        return new LeastLatencyBalancer(unweightedEndpoints);
+      default:
+        throw new Error(`Unsupported load balancing method: ${method}`);
+    }
   }
 }
 
@@ -169,5 +188,54 @@ export class LeastLatencyBalancer extends BaseBalancer {
     }
 
     return best;
+  }
+}
+
+export class WeightedBalancer extends BaseBalancer {
+  private weights: Map<string, number> = new Map();
+  private healthyWeights: Map<string, number> = new Map();
+  private totalWeight: number = 0;
+
+  constructor(targets: WeightedEndpointArray) {
+    const urls = targets.map((t) => t.url);
+    super(urls);
+
+    for (const { url, weight } of targets) {
+      this.weights.set(url, weight);
+    }
+
+    this.recalculateHealthyWeights();
+    setInterval(
+      () => this.recalculateHealthyWeights(),
+      this.healthCheckInterval
+    );
+  }
+
+  private recalculateHealthyWeights() {
+    this.healthyWeights.clear();
+    this.totalWeight = 0;
+
+    for (const url of this.getHealthyTargets()) {
+      const weight = this.weights.get(url) ?? 1;
+      this.healthyWeights.set(url, weight);
+      this.totalWeight += weight;
+    }
+  }
+
+  getEndpoint(): string {
+    if (this.healthyWeights.size === 0)
+      throw new Error("No healthy RPC endpoints available");
+
+    const random = Math.random() * this.totalWeight;
+    let cumulative = 0;
+
+    for (const [url, weight] of this.healthyWeights.entries()) {
+      cumulative += weight;
+      if (random <= cumulative) {
+        return url;
+      }
+    }
+
+    return Array.from(this.healthyWeights.keys())[0];
   }
 }
