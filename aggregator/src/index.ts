@@ -1,7 +1,7 @@
-import { bootstrapServer } from "./core/bootstrap";
+import { ConfigOptions } from "../types";
+import { startHTTPServer, startWebsocketServer } from "./core/bootstrap";
 
-bootstrapServer({
-  transport: "http",
+const CONFIG: ConfigOptions = {
   network: "devnet",
   balancingOptions: {
     method: "least-connections",
@@ -12,4 +12,7 @@ bootstrapServer({
   },
   cachingMethod: { type: "memory" },
   maxRetries: 5,
-});
+};
+
+startHTTPServer(CONFIG);
+// startWebsocketServer(CONFIG)

@@ -1,10 +1,9 @@
-import { ConfigOptions, WeightedEndpointArray } from "../../types";
+import { ConfigOptions } from "../../types";
 import { initHTTPServer } from "../transport/http";
 import { createBalancer } from "./balancing";
 import { createCache } from "./caching";
 
-export async function bootstrapServer({
-  transport,
+export async function startHTTPServer({
   network,
   balancingOptions,
   cachingMethod,
@@ -14,12 +13,18 @@ export async function bootstrapServer({
   const balancer = createBalancer(balancingOptions, network);
   const cache = createCache(cachingMethod);
 
-  if (transport === "http") {
-    await initHTTPServer({ balancer, cache, port, maxRetries });
-  }
-  //   else if (transport === "ws") await initWebSocketServer();
-  //   else {
-  //     await initHttpServer();
-  //     await initWebSocketServer();
-  //   }
+  await initHTTPServer({ balancer, cache, port, maxRetries });
+}
+
+export async function startWebsocketServer({
+  network,
+  balancingOptions,
+  cachingMethod,
+  port,
+  maxRetries = 3,
+}: ConfigOptions) {
+  const balancer = createBalancer(balancingOptions, network);
+  const cache = createCache(cachingMethod);
+
+  // await initWebSocketServer({ balancer, cache, port, maxRetries });
 }

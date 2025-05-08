@@ -1,8 +1,6 @@
 import { MemcachedCache, MemoryCache, RedisCache } from "../src/core/caching";
 import { Balancer } from "../src/lib/interfaces";
 
-type TransportOptions = "http" | "ws" | "both";
-
 export type NetworkOptions = "devnet" | "mainnet";
 
 type CacheMemory = { type: "memory" };
@@ -73,7 +71,6 @@ export type BalancingOptions =
   | UnweightedBalancingOption;
 
 export type ConfigOptions = {
-  transport: TransportOptions;
   network: NetworkOptions;
   balancingOptions: BalancingOptions;
   cachingMethod: CachingMethods;
