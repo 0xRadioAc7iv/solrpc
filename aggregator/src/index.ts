@@ -1,4 +1,4 @@
-import { ConfigOptions } from "../types";
+import { ConfigOptions } from "./types";
 import { startHTTPServer, startWebsocketServer } from "./core/bootstrap";
 
 const CONFIG: ConfigOptions = {

@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { ServerOptions, ValidRequestBody } from "../../types";
+import { ServerOptions, ValidRequestBody } from "../types";
 import { getCachePolicyForMethod } from "./cachePolicy";
 import { requestsWithRetry } from "../utils/requestRetry";
 

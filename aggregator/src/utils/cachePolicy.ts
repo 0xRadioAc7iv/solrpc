@@ -1,4 +1,4 @@
-import { CachePolicy } from "../../types";
+import { CachePolicy } from "../types";
 
 export function getCachePolicyForMethod(method: string): CachePolicy {
   const forever = 60 * 60 * 1000;

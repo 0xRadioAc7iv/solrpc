@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { CacheEntry, CachingMethods } from "../../types";
+import { CacheEntry, CachingMethods } from "../types";
 import Redis from "ioredis";
 import memjs from "memjs";
 

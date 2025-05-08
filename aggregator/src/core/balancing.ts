@@ -2,7 +2,7 @@ import {
   BalancingOptions,
   NetworkOptions,
   WeightedEndpointArray,
-} from "../../types";
+} from "../types";
 import { Balancer } from "../lib/interfaces";
 
 export function createBalancer(

@@ -1,4 +1,4 @@
-import { ConfigOptions } from "../../types";
+import { ConfigOptions } from "../types";
 import { initHTTPServer } from "../transport/http";
 import { createBalancer } from "./balancing";
 import { createCache } from "./caching";

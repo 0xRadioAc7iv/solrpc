@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { ServerOptions } from "../../types";
+import { ServerOptions } from "../types";
 import { validateRequestBody } from "../utils/validate";
 import { handleRequest } from "../utils/requestHandler";
 

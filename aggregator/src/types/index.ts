@@ -1,5 +1,5 @@
-import { MemcachedCache, MemoryCache, RedisCache } from "../src/core/caching";
-import { Balancer } from "../src/lib/interfaces";
+import { MemcachedCache, MemoryCache, RedisCache } from "../core/caching";
+import { Balancer } from "../lib/interfaces";
 
 export type NetworkOptions = "devnet" | "mainnet";
 

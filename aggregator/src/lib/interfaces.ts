@@ -1,5 +1,5 @@
 import { FastifyBaseLogger } from "fastify";
-import { ValidRequestBody } from "../../types";
+import { ValidRequestBody } from "../types";
 
 export interface Balancer {
   getEndpoint(): string;
