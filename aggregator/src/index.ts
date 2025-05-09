@@ -12,7 +12,6 @@ const CONFIG: ConfigOptions = {
       },
     },
     ws: {
-      method: "least-connections",
       endpoints: {
         devnet: ["wss://api.devnet.solana.com"],
         mainnet: ["wss://api.mainnet-beta.solana.com"],

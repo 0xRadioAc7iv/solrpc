@@ -62,15 +62,9 @@ export type HttpConfig =
       endpoints: Record<NetworkOptions, SimpleEndpoint[]>;
     };
 
-export type WsConfig =
-  | {
-      method: "weighted";
-      endpoints: Record<NetworkOptions, WeightedEndpoint[]>;
-    }
-  | {
-      method: Exclude<LoadBalancingMethods, "weighted" | "least-latency">;
-      endpoints: Record<NetworkOptions, SimpleEndpoint[]>;
-    };
+export type WsConfig = {
+  endpoints: Record<NetworkOptions, SimpleEndpoint[]>;
+};
 
 export type BalancingOptions = { http?: HttpConfig; ws?: WsConfig };
 

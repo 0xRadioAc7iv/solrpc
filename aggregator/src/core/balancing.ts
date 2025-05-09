@@ -1,65 +1,33 @@
-import { BalancingOptions, NetworkOptions, WeightedEndpoint } from "../types";
+import {
+  BalancingOptions,
+  HttpConfig,
+  NetworkOptions,
+  WeightedEndpoint,
+} from "../types";
 import { Balancer } from "../lib/interfaces";
 
-export function createBalancers(
-  balancingOptions: BalancingOptions,
+export function createBalancer(
+  httpConfig: HttpConfig,
   network: NetworkOptions
-): { httpBalancer: Balancer | undefined; wsBalancer: Balancer | undefined } {
-  let httpBalancer: Balancer | undefined;
-  let wsBalancer: Balancer | undefined;
+): Balancer {
+  const { method, endpoints } = httpConfig;
 
-  const { http, ws } = balancingOptions;
-
-  if (!http && !ws) {
-    throw new Error("At least one of 'http' or 'ws' must be configured!");
-  }
-
-  if (http) {
-    const { method, endpoints } = http;
-
-    if (method === "weighted") {
-      const weightedEndpoints = endpoints[network];
-      httpBalancer = new WeightedBalancer(weightedEndpoints);
-    } else {
-      const unweightedEndpoints = endpoints[network];
-      switch (method) {
-        case "round-robin":
-          httpBalancer = new RoundRobinBalancer(unweightedEndpoints);
-          break;
-        case "least-connections":
-          httpBalancer = new LeastConnectionsBalancer(unweightedEndpoints);
-          break;
-        case "least-latency":
-          httpBalancer = new LeastLatencyBalancer(unweightedEndpoints);
-          break;
-        default:
-          throw new Error(`Unsupported load balancing method: ${method}`);
-      }
+  if (method === "weighted") {
+    const weightedEndpoints = endpoints[network];
+    return new WeightedBalancer(weightedEndpoints);
+  } else {
+    const unweightedEndpoints = endpoints[network];
+    switch (method) {
+      case "round-robin":
+        return new RoundRobinBalancer(unweightedEndpoints);
+      case "least-connections":
+        return new LeastConnectionsBalancer(unweightedEndpoints);
+      case "least-latency":
+        return new LeastLatencyBalancer(unweightedEndpoints);
+      default:
+        throw new Error(`Unsupported load balancing method: ${method}`);
     }
   }
-
-  if (ws) {
-    const { method, endpoints } = ws;
-
-    if (method === "weighted") {
-      const weightedEndpoints = endpoints[network];
-      wsBalancer = new WeightedBalancer(weightedEndpoints);
-    } else {
-      const unweightedEndpoints = endpoints[network];
-      switch (method) {
-        case "round-robin":
-          wsBalancer = new RoundRobinBalancer(unweightedEndpoints);
-          break;
-        case "least-connections":
-          wsBalancer = new LeastConnectionsBalancer(unweightedEndpoints);
-          break;
-        default:
-          throw new Error(`Unsupported load balancing method: ${method}`);
-      }
-    }
-  }
-
-  return { httpBalancer, wsBalancer };
 }
 
 abstract class BaseBalancer implements Balancer {

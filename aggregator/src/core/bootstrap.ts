@@ -1,6 +1,6 @@
 import { ConfigOptions } from "../types";
 import { initHTTPServer } from "../transport/http";
-import { createBalancers } from "./balancing";
+import { createBalancer } from "./balancing";
 import { createCache } from "./caching";
 
 export async function bootstrapServer({
@@ -10,14 +10,17 @@ export async function bootstrapServer({
   port,
   maxRetries = 3,
 }: ConfigOptions) {
-  const cache = createCache(cachingMethod);
-  const { httpBalancer, wsBalancer } = createBalancers(
-    balancingOptions,
-    network
-  );
+  const { http, ws } = balancingOptions;
 
-  if (httpBalancer) {
-    await initHTTPServer({ balancer: httpBalancer, cache, port, maxRetries });
+  if (!http && !ws) {
+    throw new Error("At least one of 'http' or 'ws' must be configured!");
+  }
+
+  const cache = createCache(cachingMethod);
+
+  if (http) {
+    const balancer = createBalancer(http, network);
+    await initHTTPServer({ balancer, cache, port, maxRetries });
   }
 
   // if (ws) {
