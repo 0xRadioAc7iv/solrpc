@@ -1,30 +1,26 @@
 import { ConfigOptions } from "../types";
 import { initHTTPServer } from "../transport/http";
-import { createBalancer } from "./balancing";
+import { createBalancers } from "./balancing";
 import { createCache } from "./caching";
 
-export async function startHTTPServer({
+export async function bootstrapServer({
   network,
   balancingOptions,
   cachingMethod,
   port,
   maxRetries = 3,
 }: ConfigOptions) {
-  const balancer = createBalancer(balancingOptions, network);
   const cache = createCache(cachingMethod);
+  const { httpBalancer, wsBalancer } = createBalancers(
+    balancingOptions,
+    network
+  );
 
-  await initHTTPServer({ balancer, cache, port, maxRetries });
-}
+  if (httpBalancer) {
+    await initHTTPServer({ balancer: httpBalancer, cache, port, maxRetries });
+  }
 
-export async function startWebsocketServer({
-  network,
-  balancingOptions,
-  cachingMethod,
-  port,
-  maxRetries = 3,
-}: ConfigOptions) {
-  const balancer = createBalancer(balancingOptions, network);
-  const cache = createCache(cachingMethod);
-
-  // await initWebSocketServer({ balancer, cache, port, maxRetries });
+  // if (ws) {
+  //   await initWebsocketServer({ balancer: wsBalancer, cache, port, maxRetries });
+  // }
 }

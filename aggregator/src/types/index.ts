@@ -26,7 +26,7 @@ export type CachePolicy =
       cacheable: false;
     };
 
-type LoadBalancingOptions =
+type LoadBalancingMethods =
   | "round-robin"
   | "least-connections"
   | "least-latency"
@@ -37,7 +37,7 @@ type Cache = MemoryCache | RedisCache | MemcachedCache;
 export type ServerOptions = {
   balancer: Balancer;
   cache: Cache;
-  port: number | undefined;
+  port?: number;
   maxRetries: number;
 };
 
@@ -48,27 +48,31 @@ export type ValidRequestBody = {
   params: any;
 };
 
-export type WeightedEndpointArray = Array<{ url: string; weight: number }>;
+export type WeightedEndpoint = { url: string; weight: number };
 
-type WeightedBalancingOption = {
-  method: "weighted";
-  endpoints: {
-    devnet: WeightedEndpointArray;
-    mainnet: WeightedEndpointArray;
-  };
-};
+type SimpleEndpoint = string;
 
-type UnweightedBalancingOption = {
-  method: Exclude<LoadBalancingOptions, "weighted">;
-  endpoints: {
-    devnet: string[];
-    mainnet: string[];
-  };
-};
+export type HttpConfig =
+  | {
+      method: "weighted";
+      endpoints: Record<NetworkOptions, WeightedEndpoint[]>;
+    }
+  | {
+      method: Exclude<LoadBalancingMethods, "weighted">;
+      endpoints: Record<NetworkOptions, SimpleEndpoint[]>;
+    };
 
-export type BalancingOptions =
-  | WeightedBalancingOption
-  | UnweightedBalancingOption;
+export type WsConfig =
+  | {
+      method: "weighted";
+      endpoints: Record<NetworkOptions, WeightedEndpoint[]>;
+    }
+  | {
+      method: Exclude<LoadBalancingMethods, "weighted" | "least-latency">;
+      endpoints: Record<NetworkOptions, SimpleEndpoint[]>;
+    };
+
+export type BalancingOptions = { http?: HttpConfig; ws?: WsConfig };
 
 export type ConfigOptions = {
   network: NetworkOptions;
