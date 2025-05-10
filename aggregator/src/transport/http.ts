@@ -1,11 +1,11 @@
 import Fastify from "fastify";
-import { ServerOptions } from "../types";
+import { HttpServerOptions } from "../types";
 import { validateRequestBody } from "../utils/validate";
 import { handleRequest } from "../utils/requestHandler";
 
 const httpServer = Fastify({ logger: true });
 
-export async function initHTTPServer(options: ServerOptions) {
+export async function initHTTPServer(options: HttpServerOptions) {
   const handler = await handleRequest(options);
 
   httpServer.register((fastify, _, done) => {

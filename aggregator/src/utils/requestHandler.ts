@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { ServerOptions, ValidRequestBody } from "../types";
+import { HttpServerOptions, ValidRequestBody } from "../types";
 import { getCachePolicyForMethod } from "./cachePolicy";
 import { requestsWithRetry } from "../utils/requestRetry";
 
@@ -7,7 +7,7 @@ export async function handleRequest({
   balancer,
   cache,
   maxRetries,
-}: ServerOptions) {
+}: HttpServerOptions) {
   const handler = async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = Date.now();
     let method = "unknown";

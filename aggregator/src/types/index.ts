@@ -34,11 +34,18 @@ type LoadBalancingMethods =
 
 type Cache = MemoryCache | RedisCache | MemcachedCache;
 
-export type ServerOptions = {
-  balancer: Balancer;
+type BaseServerOptions = {
   cache: Cache;
   port?: number;
   maxRetries: number;
+};
+
+export type HttpServerOptions = BaseServerOptions & {
+  balancer: Balancer;
+};
+
+export type WebsocketServerOptions = BaseServerOptions & {
+  endpoints: SimpleEndpoint[];
 };
 
 export type ValidRequestBody = {

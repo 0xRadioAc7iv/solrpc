@@ -1,9 +1,4 @@
-import {
-  BalancingOptions,
-  HttpConfig,
-  NetworkOptions,
-  WeightedEndpoint,
-} from "../types";
+import { HttpConfig, NetworkOptions, WeightedEndpoint } from "../types";
 import { Balancer } from "../lib/interfaces";
 
 export function createBalancer(
