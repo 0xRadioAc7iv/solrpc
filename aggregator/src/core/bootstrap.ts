@@ -17,11 +17,13 @@ export async function bootstrapServer({
     throw new Error("At least one of 'http' or 'ws' must be configured!");
   }
 
-  const cache = createCache(cachingMethod);
-
   if (http) {
-    const balancer = createBalancer(http, network);
-    await initHTTPServer({ balancer, cache, port, maxRetries });
+    await initHTTPServer({
+      balancer: createBalancer(http, network),
+      cache: createCache(cachingMethod),
+      port,
+      maxRetries,
+    });
   }
 
   if (ws) {

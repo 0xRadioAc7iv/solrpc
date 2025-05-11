@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import fastifyWebsocket from "@fastify/websocket";
 import { WebsocketServerOptions } from "../types";
+import { websocketEventHandler } from "../utils/wsHandler";
 
 const wsServer = Fastify();
 
@@ -14,20 +15,14 @@ wsServer.setErrorHandler((error, request, reply) => {
 });
 
 export async function initWebsocketServer(options: WebsocketServerOptions) {
-  let { port } = options;
+  let { port, endpoints } = options;
 
   // Set default port
   if (!port) port = 9595;
 
   wsServer.register(async function (fastify) {
-    fastify.get("/", { websocket: true }, (connection, req) => {
-      connection.send("hello!");
-
-      connection.on("message", (message: Buffer) => {
-        console.log(message.toString());
-        connection.send("hi from server");
-      });
-    });
+    fastify.decorate("endpoints", endpoints);
+    fastify.get("/", { websocket: true }, websocketEventHandler);
   });
 
   try {

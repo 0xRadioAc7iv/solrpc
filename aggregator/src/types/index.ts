@@ -1,6 +1,41 @@
 import { MemcachedCache, MemoryCache, RedisCache } from "../core/caching";
 import { Balancer } from "../lib/interfaces";
 
+export const WebsocketMethods = [
+  "accountSubscribe",
+  "accountUnsubscribe",
+  "blockSubscribe",
+  "blockUnsubscribe",
+  "logsSubscribe",
+  "logsUnsubscribe",
+  "programSubscribe",
+  "programUnsubscribe",
+  "rootSubscribe",
+  "rootUnsubscribe",
+  "signatureSubscribe",
+  "signatureUnsubscribe",
+  "slotSubscribe",
+  "slotsUpdatesSubscribe",
+  "slotsUpdatesUnsubscribe",
+  "slotUnsubscribe",
+  "voteSubscribe",
+  "voteUnsubscribe",
+] as const;
+
+export type ValidWsMethod = (typeof WebsocketMethods)[number];
+
+export type Success<T> = {
+  data: T;
+  error: null;
+};
+
+export type Failure<E> = {
+  data: null;
+  error: E;
+};
+
+export type Result<T, E = Error> = Success<T> | Failure<E>;
+
 export type NetworkOptions = "devnet" | "mainnet";
 
 type CacheMemory = { type: "memory" };
