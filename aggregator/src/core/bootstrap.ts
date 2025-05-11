@@ -22,17 +22,13 @@ export async function bootstrapServer({
   if (http) {
     const balancer = createBalancer(http, network);
     await initHTTPServer({ balancer, cache, port, maxRetries });
-    console.log(`HTTP Server listening at: http://localhost:${port}`);
   }
 
   if (ws) {
     await initWebsocketServer({
-      cache,
       port,
-      maxRetries,
       endpoints:
         network === "devnet" ? ws.endpoints.devnet : ws.endpoints.mainnet,
     });
-    console.log(`Websocket Server listening at: ws://localhost:${port}`);
   }
 }

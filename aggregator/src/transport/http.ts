@@ -7,6 +7,7 @@ const httpServer = Fastify({ logger: true });
 
 export async function initHTTPServer(options: HttpServerOptions) {
   const handler = await handleRequest(options);
+  const port = options.port || 8585;
 
   httpServer.register((fastify, _, done) => {
     fastify.post("/", {
@@ -21,5 +22,6 @@ export async function initHTTPServer(options: HttpServerOptions) {
     done();
   });
 
-  httpServer.listen({ port: options.port || 9000 });
+  httpServer.listen({ port: port });
+  console.log(`HTTP Server listening at: http://localhost:${port}`);
 }
