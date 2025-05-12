@@ -1,41 +1,6 @@
 import { MemcachedCache, MemoryCache, RedisCache } from "../core/caching";
 import { Balancer } from "../lib/interfaces";
 
-export const WebsocketMethods = [
-  "accountSubscribe",
-  "accountUnsubscribe",
-  "blockSubscribe",
-  "blockUnsubscribe",
-  "logsSubscribe",
-  "logsUnsubscribe",
-  "programSubscribe",
-  "programUnsubscribe",
-  "rootSubscribe",
-  "rootUnsubscribe",
-  "signatureSubscribe",
-  "signatureUnsubscribe",
-  "slotSubscribe",
-  "slotsUpdatesSubscribe",
-  "slotsUpdatesUnsubscribe",
-  "slotUnsubscribe",
-  "voteSubscribe",
-  "voteUnsubscribe",
-] as const;
-
-export type ValidWsMethod = (typeof WebsocketMethods)[number];
-
-export type Success<T> = {
-  data: T;
-  error: null;
-};
-
-export type Failure<E> = {
-  data: null;
-  error: E;
-};
-
-export type Result<T, E = Error> = Success<T> | Failure<E>;
-
 export type NetworkOptions = "devnet" | "mainnet";
 
 type CacheMemory = { type: "memory" };
@@ -76,11 +41,6 @@ export type HttpServerOptions = {
   balancer: Balancer;
 };
 
-export type WebsocketServerOptions = {
-  port?: number;
-  endpoints: SimpleEndpoint[];
-};
-
 export type ValidRequestBody = {
   jsonrpc: "2.0";
   id: number;
@@ -102,11 +62,7 @@ export type HttpConfig =
       endpoints: Record<NetworkOptions, SimpleEndpoint[]>;
     };
 
-export type WsConfig = {
-  endpoints: Record<NetworkOptions, SimpleEndpoint[]>;
-};
-
-export type BalancingOptions = { http?: HttpConfig; ws?: WsConfig };
+export type BalancingOptions = { http: HttpConfig };
 
 export type ConfigOptions = {
   network: NetworkOptions;

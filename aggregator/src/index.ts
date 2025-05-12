@@ -4,17 +4,11 @@ import { bootstrapServer } from "./core/bootstrap";
 const CONFIG: ConfigOptions = {
   network: "devnet",
   balancingOptions: {
-    // http: {
-    //   method: "round-robin",
-    //   endpoints: {
-    //     devnet: ["https://api.devnet.solana.com"],
-    //     mainnet: ["https://api.mainnet-beta.solana.com"],
-    //   },
-    // },
-    ws: {
+    http: {
+      method: "round-robin",
       endpoints: {
-        devnet: ["wss://api.devnet.solana.com"],
-        mainnet: ["wss://api.mainnet-beta.solana.com"],
+        devnet: ["https://api.devnet.solana.com"],
+        mainnet: ["https://api.mainnet-beta.solana.com"],
       },
     },
   },
