@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
   AlertCircle,
   CheckCircle,
@@ -74,7 +73,6 @@ export default function Networks() {
         <TabsList>
           <TabsTrigger value="active">Active Networks</TabsTrigger>
           <TabsTrigger value="testnet">Testnets</TabsTrigger>
-          <TabsTrigger value="custom">Custom Networks</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="space-y-4">
@@ -264,74 +262,6 @@ export default function Networks() {
                     <Button size="sm">Configure</Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="custom" className="space-y-4">
-          <Card className="bg-black text-white border border-gray-800">
-            <CardHeader>
-              <CardTitle>Custom Networks</CardTitle>
-              <CardDescription>
-                Add and manage your custom blockchain networks
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-md border border-dashed p-8 text-center">
-                <h3 className="font-medium mb-2">No Custom Networks</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  You have not added any custom networks yet
-                </p>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Custom Network
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-black text-white border border-gray-800">
-            <CardHeader>
-              <CardTitle>Add Custom Network</CardTitle>
-              <CardDescription>
-                Configure a new blockchain network
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="network-name">Network Name</Label>
-                  <Input
-                    id="network-name"
-                    placeholder="e.g., My Custom Network"
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="network-id">Network ID</Label>
-                  <Input id="network-id" placeholder="e.g., custom-mainnet" />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="chain-id">Chain ID</Label>
-                  <Input id="chain-id" placeholder="e.g., 1" />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="rpc-url">Default RPC URL</Label>
-                  <Input id="rpc-url" placeholder="https://..." />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch id="network-enabled" />
-                  <Label htmlFor="network-enabled">Enable Network</Label>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline">Cancel</Button>
-                <Button>Save Network</Button>
               </div>
             </CardContent>
           </Card>

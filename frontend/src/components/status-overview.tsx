@@ -22,7 +22,7 @@ export function StatusOverview() {
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">System Status</h2>
-        <Select defaultValue="mainnet" >
+        <Select defaultValue="mainnet">
           <SelectTrigger className="w-[180px] custom-get-started-button">
             <SelectValue placeholder="Select network" />
           </SelectTrigger>
@@ -94,50 +94,23 @@ export function StatusOverview() {
                   <AlertTriangle className="h-5 w-5 text-yellow-500" />
                   <span>Redis</span>
                 </div>
-                <Badge variant="outline" className="text-white">Not Configured</Badge>
+                <Badge variant="outline" className="text-white">
+                  Not Configured
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <XCircle className="h-5 w-5 text-red-500" />
                   <span>Memcached</span>
                 </div>
-                <Badge variant="outline" className="text-white">Disabled</Badge>
-              </div> 
+                <Badge variant="outline" className="text-white">
+                  Disabled
+                </Badge>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      <Card className="bg-black border border-gray-800 text-white">
-        <CardHeader>
-          <CardTitle className="text-base">Address Blacklist</CardTitle>
-          <CardDescription>
-            Suspicious addresses are automatically blocked
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-sm">5xrM...8j2P</span>
-              </div>
-              <Badge variant="destructive">Blocked</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-sm">9qLV...dF3R</span>
-              </div>
-              <Badge variant="destructive">Blocked</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-sm">3zTm...kL7Y</span>
-              </div>
-              <Badge variant="destructive">Blocked</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
