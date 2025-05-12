@@ -1,7 +1,9 @@
-import { ConfigOptions } from "./types";
-import { bootstrapServer } from "./core/bootstrap";
+import { Server } from "./core/server";
+import { Config } from "./core/config";
 
-const CONFIG: ConfigOptions = {
+let server: Server;
+
+const config = new Config({
   network: "devnet",
   balancingOptions: {
     http: {
@@ -14,6 +16,12 @@ const CONFIG: ConfigOptions = {
   },
   cachingMethod: { type: "memory" },
   maxRetries: 5,
-};
+});
 
-bootstrapServer(CONFIG);
+async function main() {
+  server = await Server.init(config.getConfig());
+}
+
+main();
+
+export { config, server };

@@ -36,7 +36,6 @@ type Cache = MemoryCache | RedisCache | MemcachedCache;
 
 export type HttpServerOptions = {
   cache: Cache;
-  port?: number;
   maxRetries: number;
   balancer: Balancer;
 };
@@ -68,6 +67,5 @@ export type ConfigOptions = {
   network: NetworkOptions;
   balancingOptions: BalancingOptions;
   cachingMethod: CachingMethods;
-  port?: number;
   maxRetries?: number;
 };

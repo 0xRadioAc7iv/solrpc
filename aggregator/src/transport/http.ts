@@ -1,13 +1,14 @@
-import Fastify from "fastify";
+import Fastify, { FastifyInstance } from "fastify";
 import { HttpServerOptions } from "../types";
 import { validateRequestBody } from "../utils/validate";
 import { handleRequest } from "../utils/requestHandler";
+import { apiRouteGroup } from "../api/routes/dashboardRouteGroup";
 
-const httpServer = Fastify({ logger: true });
-
-export async function initHTTPServer(options: HttpServerOptions) {
+export async function initHTTPServer(
+  options: HttpServerOptions
+): Promise<FastifyInstance> {
+  const httpServer = Fastify({ logger: true });
   const handler = await handleRequest(options);
-  const port = options.port || 8585;
 
   httpServer.register((fastify, _, done) => {
     fastify.post("/", {
@@ -19,9 +20,13 @@ export async function initHTTPServer(options: HttpServerOptions) {
       reply.code(200).send();
     });
 
+    fastify.register(apiRouteGroup, { prefix: "/api/dashboard" });
+
     done();
   });
 
-  httpServer.listen({ port: port });
-  console.log(`HTTP Server listening at: http://localhost:${port}`);
+  httpServer.listen({ port: 8585 });
+  console.log(`HTTP Server listening at: http://localhost:8585`);
+
+  return httpServer;
 }
