@@ -415,7 +415,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-[#0a0a1f] relative rounded-xl overflow-hidden h-96 flex flex-col justify-center gap-2 px-4 border border-[#1a1a3a] md:col-span-2 w-full max-w-5xl ">
+            <div className="bg-[#0a0a1f] relative rounded-xl overflow-hidden h-96 flex flex-col justify-center gap-2 px-6 border border-[#1a1a3a] md:col-span-2 w-full max-w-5xl ">
               <style>
                 {`
                 @keyframes float {
@@ -474,7 +474,7 @@ export default function Home() {
               </div>
 
               {/* Endpoint list */}
-              <div className="relative z-20 flex flex-col gap-4">
+              <div className="relative z-20 flex flex-col gap-2">
                 {endpoints.map((endpoint, index) => (
                   <div
                     key={index}
@@ -484,8 +484,8 @@ export default function Home() {
                       {endpoint.url}
                     </div>
                     <div className="flex items-center gap-1 md:gap-6">
-                      <div className="flex items-center justify-center px-2 py-0.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
-                        <span className="text-white/80 text-xs">
+                      <div className="flex items-center justify-center px-2 py-0.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 custom-get-started-button">
+                        <span className="text-white/80 text-xs ">
                           {endpoint.visibility}
                         </span>
                       </div>

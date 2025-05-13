@@ -314,6 +314,7 @@ export class WeightedBalancer extends BaseBalancer {
   }
 
   protected override getWeightForEndpoint(endpoint: string) {
+    console.log("getWeightForEndpoint", endpoint);
     return this.weights.get(endpoint);
   }
 }

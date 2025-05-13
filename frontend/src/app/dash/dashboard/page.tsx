@@ -13,7 +13,7 @@ export default function Home() {
     <div className="border border-black text-white pt-16 bg-[#050816] px-6">
       <SearchBar />
       <div>
-        <h1 className="text-4xl font-black tracking-tight instrument-serif-regular-italic mt-3 ">
+        <h1 className="text-4xl font-normal tracking-tight inter mt-3 ">
           Dashboard
         </h1>
         <p className="text-muted-foreground mt-5">
@@ -22,7 +22,7 @@ export default function Home() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 py-3">
-        <Card className=" card-glow-bg text-white rounded-lg">
+        <Card className=" custom-glow text-white rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-medium">
               Total Endpoints 
@@ -34,7 +34,7 @@ export default function Home() {
             <p className="text-sm">8 active, 4 inactive</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#050816] text-white  rounded-lg">
+        <Card className="custom-glow bg-[#050816] text-white  rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-medium">Success Rate</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
@@ -44,7 +44,7 @@ export default function Home() {
             <p className="text-sm">+0.2% from last hour</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#050816] text-white  rounded-lg">
+        <Card className="bg-[#050816] custom-glow text-white  rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-medium">
               Avg. Response Time
@@ -56,7 +56,7 @@ export default function Home() {
             <p className="text-sm">-18ms from last hour</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#050816] text-white  rounded-lg">
+        <Card className="bg-[#050816] text-white  custom-glow rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-medium">
               Blocked Requests
