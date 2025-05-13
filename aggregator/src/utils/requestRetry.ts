@@ -5,7 +5,6 @@ import { RequestsWithRetryOptions } from "../lib/interfaces";
 export async function requestsWithRetry({
   balancer,
   body,
-  log,
   maxRetries,
 }: RequestsWithRetryOptions): Promise<{
   response: any | null;
@@ -48,11 +47,14 @@ export async function requestsWithRetry({
     } catch (err: any) {
       lastError = err.message;
       engine.addLog({
-        type: "rpc-retry-error",
+        type: "error",
         timestamp: Date.now(),
-        attemptNumber: attempt,
-        endpoint: endpoint,
-        message: err.message,
+        entry: {
+          type: "rpc-retry-error",
+          attemptNumber: attempt,
+          endpoint: endpoint,
+          message: err.message,
+        },
       });
     } finally {
       if (balancer instanceof LeastConnectionsBalancer && endpointUsed) {

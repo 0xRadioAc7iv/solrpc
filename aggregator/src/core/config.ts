@@ -7,11 +7,11 @@ export class Config {
     this.config = config;
   }
 
-  getConfig() {
-    return this.config;
-  }
-
   updateConfig(newConfig: ConfigOptions) {
     this.config = newConfig;
+  }
+
+  getConfig() {
+    return this.config;
   }
 }

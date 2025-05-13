@@ -23,6 +23,7 @@ export async function handleRequest({
       method = body.method;
       requestId = body.id;
 
+      engine.addRequest(requestId);
       engine.addLog({
         type: "debug",
         timestamp: Date.now(),
@@ -48,6 +49,7 @@ export async function handleRequest({
               method,
             },
           });
+          engine.addResponseLatency(Date.now() - startTime, true, true);
           reply.code(200).send(JSON.parse(cached));
           return;
         } else {
@@ -66,13 +68,13 @@ export async function handleRequest({
       const { response, error } = await requestsWithRetry({
         balancer,
         body,
-        log: request.log,
         maxRetries,
       });
 
       if (response) {
         reply.code(200).send(response);
 
+        engine.addResponseLatency(Date.now() - startTime, false, true);
         engine.addLog({
           type: "debug",
           timestamp: Date.now(),
@@ -92,6 +94,7 @@ export async function handleRequest({
           );
         }
       } else {
+        engine.incrementUnsuccessfullRequests();
         engine.addLog({
           type: "error",
           timestamp: Date.now(),
@@ -113,6 +116,8 @@ export async function handleRequest({
         });
       }
     } catch (err: any) {
+      engine.addResponseLatency(Date.now() - startTime, false, false);
+      engine.incrementUnsuccessfullRequests();
       engine.addLog({
         type: "error",
         timestamp: Date.now(),
@@ -133,17 +138,6 @@ export async function handleRequest({
         },
       });
     }
-    // **** REPLACE WITH STATSENGINE RESPONSE CAPTURING ****
-
-    // finally {
-    // const duration = Date.now() - startTime;
-    // request.log.info({
-    //   type: "request-duration",
-    //   id: requestId,
-    //   method,
-    //   durationMs: duration,
-    // });
-    // }
   };
 
   return handler;

@@ -2,6 +2,7 @@ import { MemcachedCache, MemoryCache, RedisCache } from "../core/caching";
 import { StatEngine } from "../core/stats";
 import { Balancer } from "../lib/interfaces";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const HTTP_METHODS = [
   "getBlock",
   "getTransaction",
@@ -135,6 +136,11 @@ type LogEntryInfo = {
   entry: string;
 };
 
+type LogEntryErrorRpcUnhealthy = {
+  type: "rpc-unhealthy";
+  endpoint: string;
+};
+
 type LogEntryErrorRpcRetry = {
   type: "rpc-retry-error";
   attemptNumber: number;
@@ -162,7 +168,8 @@ type LogEntryError = {
   entry:
     | LogEntryErrorRpcRetry
     | LogEntryErrorRpcFailure
-    | LogEntryErrorRpcUnhandled;
+    | LogEntryErrorRpcUnhandled
+    | LogEntryErrorRpcUnhealthy;
 };
 
 type LogEntryDebugEntryIncomingRequest = {
@@ -210,3 +217,22 @@ type LogEntryDebug = {
 };
 
 export type LogEntry = LogEntryInfo | LogEntryError | LogEntryDebug;
+
+export type StatRequestData = {
+  requestId: number;
+  timestamp: number;
+};
+
+export type StatResponseLatency = {
+  latency: number;
+  timestamp: number;
+  cachedResponse: boolean;
+  success: boolean;
+};
+
+export type StatEndpointsData = {
+  network: NetworkOptions;
+  latency: number;
+  weight?: number;
+  isActive: boolean;
+};

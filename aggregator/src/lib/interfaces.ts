@@ -1,4 +1,3 @@
-import { FastifyBaseLogger } from "fastify";
 import { ValidRequestBody } from "../types";
 
 export interface Balancer {
@@ -14,6 +13,5 @@ export interface Cache {
 export interface RequestsWithRetryOptions {
   balancer: Balancer;
   body: ValidRequestBody;
-  log: FastifyBaseLogger;
   maxRetries: number;
 }

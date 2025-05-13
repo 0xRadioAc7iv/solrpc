@@ -1,6 +1,8 @@
 import { HttpConfig, NetworkOptions, WeightedEndpoint } from "../types";
 import { Balancer } from "../lib/interfaces";
-import { engine } from "..";
+import { config, engine } from "..";
+
+const cf = config.getConfig();
 
 export function createBalancer(
   httpConfig: HttpConfig,
@@ -46,6 +48,7 @@ abstract class BaseBalancer implements Balancer {
         timestamp: Date.now(),
       });
       for (const target of this.targets) {
+        const startTime = Date.now();
         try {
           const res = await fetch(target, {
             method: "POST",
@@ -56,27 +59,54 @@ abstract class BaseBalancer implements Balancer {
               method: "getHealth",
             }),
           });
-          const data = await res.json();
-          if (data?.result === "ok") {
+          if (res.ok) {
             this.healthyTargets.add(target);
+            engine.updateEndpointsData(target, {
+              network: cf.network,
+              isActive: true,
+              latency: Date.now() - startTime,
+              weight: this.getWeightForEndpoint(target),
+            });
           } else {
             this.healthyTargets.delete(target);
+            engine.updateEndpointsData(target, {
+              network: cf.network,
+              isActive: false,
+              latency: Date.now() - startTime,
+              weight: this.getWeightForEndpoint(target),
+            });
             engine.addLog({
               type: "error",
-              entry: `Endpoint Unhealthy: ${target}`,
               timestamp: Date.now(),
+              entry: {
+                type: "rpc-unhealthy",
+                endpoint: target,
+              },
             });
           }
         } catch {
           this.healthyTargets.delete(target);
+          engine.updateEndpointsData(target, {
+            network: cf.network,
+            isActive: false,
+            latency: Date.now() - startTime,
+            weight: this.getWeightForEndpoint(target),
+          });
           engine.addLog({
             type: "error",
-            entry: `Endpoint Unhealthy: ${target}`,
             timestamp: Date.now(),
+            entry: {
+              type: "rpc-unhealthy",
+              endpoint: target,
+            },
           });
         }
       }
     }, this.healthCheckInterval);
+  }
+
+  protected getWeightForEndpoint(endpoint: string): number | undefined {
+    return undefined;
   }
 
   protected getHealthyTargets(): string[] {
@@ -156,7 +186,7 @@ export class LeastLatencyBalancer extends BaseBalancer {
       timestamp: Date.now(),
     });
     const promises = this.targets.map(async (target) => {
-      const start = Date.now();
+      const startTime = Date.now();
       try {
         const res = await fetch(target, {
           method: "POST",
@@ -167,27 +197,47 @@ export class LeastLatencyBalancer extends BaseBalancer {
             method: "getHealth",
           }),
         });
-        const json = await res.json();
-        const latency = Date.now() - start;
-        if (json?.result === "ok") {
+        const latency = Date.now() - startTime;
+        if (res.ok) {
           this.latencies.set(target, latency);
           this.healthyTargets.add(target);
+          engine.updateEndpointsData(target, {
+            network: cf.network,
+            isActive: true,
+            latency: Date.now() - startTime,
+          });
         } else {
           this.latencies.delete(target);
           this.healthyTargets.delete(target);
+          engine.updateEndpointsData(target, {
+            network: cf.network,
+            isActive: false,
+            latency: Date.now() - startTime,
+          });
           engine.addLog({
             type: "error",
-            entry: `Endpoint Unhealthy: ${target}`,
             timestamp: Date.now(),
+            entry: {
+              type: "rpc-unhealthy",
+              endpoint: target,
+            },
           });
         }
       } catch {
         this.latencies.delete(target);
         this.healthyTargets.delete(target);
+        engine.updateEndpointsData(target, {
+          network: cf.network,
+          isActive: false,
+          latency: Date.now() - startTime,
+        });
         engine.addLog({
           type: "error",
-          entry: `Error measuring latency: ${target}`,
           timestamp: Date.now(),
+          entry: {
+            type: "rpc-unhealthy",
+            endpoint: target,
+          },
         });
       }
     });
@@ -261,5 +311,9 @@ export class WeightedBalancer extends BaseBalancer {
     }
 
     return Array.from(this.healthyWeights.keys())[0];
+  }
+
+  protected override getWeightForEndpoint(endpoint: string) {
+    return this.weights.get(endpoint);
   }
 }
