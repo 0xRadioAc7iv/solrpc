@@ -1,5 +1,6 @@
 import { Server } from "./core/server";
 import { Config } from "./core/config";
+import { StatEngine } from "./core/stats";
 
 let server: Server;
 
@@ -18,10 +19,12 @@ const config = new Config({
   maxRetries: 5,
 });
 
+const engine = new StatEngine();
+
 async function main() {
-  server = await Server.init(config.getConfig());
+  server = await Server.init(config.getConfig(), engine);
 }
 
 main();
 
-export { config, server };
+export { config, server, engine };

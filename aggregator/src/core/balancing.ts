@@ -1,5 +1,6 @@
 import { HttpConfig, NetworkOptions, WeightedEndpoint } from "../types";
 import { Balancer } from "../lib/interfaces";
+import { engine } from "..";
 
 export function createBalancer(
   httpConfig: HttpConfig,
@@ -39,6 +40,11 @@ abstract class BaseBalancer implements Balancer {
   private startHealthCheck() {
     this.targets.forEach((target) => this.healthyTargets.add(target));
     setInterval(async () => {
+      engine.addLog({
+        type: "info",
+        entry: "Starting health check...",
+        timestamp: Date.now(),
+      });
       for (const target of this.targets) {
         try {
           const res = await fetch(target, {
@@ -55,9 +61,19 @@ abstract class BaseBalancer implements Balancer {
             this.healthyTargets.add(target);
           } else {
             this.healthyTargets.delete(target);
+            engine.addLog({
+              type: "error",
+              entry: `Endpoint Unhealthy: ${target}`,
+              timestamp: Date.now(),
+            });
           }
         } catch {
           this.healthyTargets.delete(target);
+          engine.addLog({
+            type: "error",
+            entry: `Endpoint Unhealthy: ${target}`,
+            timestamp: Date.now(),
+          });
         }
       }
     }, this.healthCheckInterval);
@@ -68,6 +84,7 @@ abstract class BaseBalancer implements Balancer {
   }
 
   abstract getEndpoint(): string;
+
   releaseEndpoint?(endpoint: string): void;
 }
 
@@ -133,6 +150,11 @@ export class LeastLatencyBalancer extends BaseBalancer {
   }
 
   private async measureLatencies() {
+    engine.addLog({
+      type: "info",
+      entry: "Measuring endpoint latencies...",
+      timestamp: Date.now(),
+    });
     const promises = this.targets.map(async (target) => {
       const start = Date.now();
       try {
@@ -153,10 +175,20 @@ export class LeastLatencyBalancer extends BaseBalancer {
         } else {
           this.latencies.delete(target);
           this.healthyTargets.delete(target);
+          engine.addLog({
+            type: "error",
+            entry: `Endpoint Unhealthy: ${target}`,
+            timestamp: Date.now(),
+          });
         }
       } catch {
         this.latencies.delete(target);
         this.healthyTargets.delete(target);
+        engine.addLog({
+          type: "error",
+          entry: `Error measuring latency: ${target}`,
+          timestamp: Date.now(),
+        });
       }
     });
 

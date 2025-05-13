@@ -7,6 +7,7 @@ export async function handleRequest({
   balancer,
   cache,
   maxRetries,
+  engine,
 }: HttpServerOptions) {
   const handler = async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = Date.now();
@@ -17,15 +18,20 @@ export async function handleRequest({
       const body = request.body as ValidRequestBody;
       const paramKey = body.params ? JSON.stringify(body.params) : "";
 
+      engine.updateRpcMethodCount(body.method);
+
       method = body.method;
       requestId = body.id;
 
-      request.log.info({
-        type: "incoming-request",
-        id: requestId,
-        ip: request.ip,
-        method,
-        timestamp: new Date().toISOString(),
+      engine.addLog({
+        type: "debug",
+        timestamp: Date.now(),
+        entry: {
+          type: "incoming-request",
+          requestId,
+          ip: request.ip,
+          method,
+        },
       });
 
       const policy = getCachePolicyForMethod(method);
@@ -33,11 +39,27 @@ export async function handleRequest({
       if (policy.cacheable) {
         const cached = await cache.get(method, paramKey);
         if (cached) {
-          request.log.info({ type: "cache-hit", method, id: requestId });
+          engine.addLog({
+            type: "debug",
+            timestamp: Date.now(),
+            entry: {
+              type: "cache-hit",
+              requestId,
+              method,
+            },
+          });
           reply.code(200).send(JSON.parse(cached));
           return;
         } else {
-          request.log.info({ type: "cache-miss", method, id: requestId });
+          engine.addLog({
+            type: "debug",
+            timestamp: Date.now(),
+            entry: {
+              type: "cache-miss",
+              requestId,
+              method,
+            },
+          });
         }
       }
 
@@ -51,6 +73,16 @@ export async function handleRequest({
       if (response) {
         reply.code(200).send(response);
 
+        engine.addLog({
+          type: "debug",
+          timestamp: Date.now(),
+          entry: {
+            type: "request-success",
+            requestId,
+            method,
+          },
+        });
+
         if (policy.cacheable) {
           await cache.set(
             method,
@@ -60,11 +92,14 @@ export async function handleRequest({
           );
         }
       } else {
-        request.log.error({
-          type: "rpc-failure",
-          id: requestId,
-          method,
-          error,
+        engine.addLog({
+          type: "error",
+          timestamp: Date.now(),
+          entry: {
+            type: "rpc-multiple-attempt-failure",
+            requestId,
+            method,
+          },
         });
 
         reply.code(502).send({
@@ -78,12 +113,15 @@ export async function handleRequest({
         });
       }
     } catch (err: any) {
-      request.log.error({
-        type: "rpc-unhandled-error",
-        id: requestId,
-        method,
-        message: err.message,
-        stack: err.stack,
+      engine.addLog({
+        type: "error",
+        timestamp: Date.now(),
+        entry: {
+          type: "rpc-unhandled",
+          requestId: requestId || 0,
+          method,
+          err,
+        },
       });
 
       reply.code(500).send({
@@ -94,15 +132,18 @@ export async function handleRequest({
           message: "Internal Server Error",
         },
       });
-    } finally {
-      const duration = Date.now() - startTime;
-      request.log.info({
-        type: "request-duration",
-        id: requestId,
-        method,
-        durationMs: duration,
-      });
     }
+    // **** REPLACE WITH STATSENGINE RESPONSE CAPTURING ****
+
+    // finally {
+    // const duration = Date.now() - startTime;
+    // request.log.info({
+    //   type: "request-duration",
+    //   id: requestId,
+    //   method,
+    //   durationMs: duration,
+    // });
+    // }
   };
 
   return handler;

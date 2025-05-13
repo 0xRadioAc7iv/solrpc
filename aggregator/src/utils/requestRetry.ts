@@ -1,3 +1,4 @@
+import { engine } from "..";
 import { LeastConnectionsBalancer } from "../core/balancing";
 import { RequestsWithRetryOptions } from "../lib/interfaces";
 
@@ -31,21 +32,26 @@ export async function requestsWithRetry({
 
       const json = await res.json();
 
-      log.info({
-        type: "rpc-forward",
-        attempt,
-        to: endpoint,
-        method: body.method,
-        status: json?.result ? "success" : "error",
+      engine.addLog({
+        type: "debug",
+        timestamp: Date.now(),
+        entry: {
+          type: "rpc-forward",
+          attemptNumber: attempt,
+          endpoint: endpoint,
+          method: body.method,
+          status: res.status < 400 ? "success" : "error",
+        },
       });
 
       return { response: json, error: null };
     } catch (err: any) {
       lastError = err.message;
-      log.warn({
+      engine.addLog({
         type: "rpc-retry-error",
-        attempt,
-        endpoint,
+        timestamp: Date.now(),
+        attemptNumber: attempt,
+        endpoint: endpoint,
         message: err.message,
       });
     } finally {

@@ -3,6 +3,7 @@ import { HttpServerOptions } from "../types";
 import { validateRequestBody } from "../utils/validate";
 import { handleRequest } from "../utils/requestHandler";
 import { apiRouteGroup } from "../api/routes/dashboardRouteGroup";
+import { engine } from "..";
 
 export async function initHTTPServer(
   options: HttpServerOptions
@@ -26,6 +27,11 @@ export async function initHTTPServer(
   });
 
   httpServer.listen({ port: 8585 });
+  engine.addLog({
+    type: "info",
+    entry: "HTTP Server started at port 8585",
+    timestamp: Date.now(),
+  });
   console.log(`HTTP Server listening at: http://localhost:8585`);
 
   return httpServer;

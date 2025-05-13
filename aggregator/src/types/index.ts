@@ -1,5 +1,63 @@
 import { MemcachedCache, MemoryCache, RedisCache } from "../core/caching";
+import { StatEngine } from "../core/stats";
 import { Balancer } from "../lib/interfaces";
+
+const HTTP_METHODS = [
+  "getBlock",
+  "getTransaction",
+  "getEpochSchedule",
+  "getGenesisHash",
+  "getVersion",
+  "getMinimumBalanceForRentExemption",
+  "getStakeMinimumDelegation",
+  "minimumLedgerSlot",
+  "getIdentity",
+  "getInflationGovernor",
+  "getLargestAccounts",
+  "getInflationRate",
+  "getVoteAccounts",
+  "getRecentPerformanceSamples",
+  "getRecentPrioritizationFees",
+  "getSupply",
+  "getAccountInfo",
+  "getMultipleAccounts",
+  "getBalance",
+  "getProgramAccounts",
+  "getTokenAccountsByOwner",
+  "getTokenAccountBalance",
+  "getSlot",
+  "getSlotLeader",
+  "getSlotLeaders",
+  "getBlockCommitment",
+  "getBlockProduction",
+  "getEpochInfo",
+  "getLeaderSchedule",
+  "getBlocks",
+  "getBlocksWithLimit",
+  "getBlockTime",
+  "getClusterNodes",
+  "getFirstAvailableBlock",
+  "getInflationReward",
+  "getMaxRetransmitSlot",
+  "getMaxShredInsertSlot",
+  "getTokenLargestAccounts",
+  "getTokenSupply",
+  "getTransactionCount",
+  "getSignaturesForAddress",
+  "getTokenAccountsByDelegate",
+  "isBlockhashValid",
+  "getBlockHeight",
+  "getHighestSnapshotSlot",
+  "sendTransaction",
+  "simulateTransaction",
+  "requestAirdrop",
+  "getLatestBlockhash",
+  "getFeeForMessage",
+  "getSignatureStatuses",
+  "getHealth",
+] as const;
+
+export type HttpMethods = (typeof HTTP_METHODS)[number];
 
 export type NetworkOptions = "devnet" | "mainnet";
 
@@ -38,12 +96,13 @@ export type HttpServerOptions = {
   cache: Cache;
   maxRetries: number;
   balancer: Balancer;
+  engine: StatEngine;
 };
 
 export type ValidRequestBody = {
   jsonrpc: "2.0";
   id: number;
-  method: string;
+  method: HttpMethods;
   params: any;
 };
 
@@ -69,3 +128,85 @@ export type ConfigOptions = {
   cachingMethod: CachingMethods;
   maxRetries?: number;
 };
+
+type LogEntryInfo = {
+  type: "info";
+  timestamp: number;
+  entry: string;
+};
+
+type LogEntryErrorRpcRetry = {
+  type: "rpc-retry-error";
+  attemptNumber: number;
+  endpoint: string;
+  message: string;
+};
+
+type LogEntryErrorRpcFailure = {
+  type: "rpc-multiple-attempt-failure";
+  requestId: number;
+  method: string;
+  error?: string;
+};
+
+type LogEntryErrorRpcUnhandled = {
+  type: "rpc-unhandled";
+  requestId: number;
+  method: string;
+  err: any;
+};
+
+type LogEntryError = {
+  type: "error";
+  timestamp: number;
+  entry:
+    | LogEntryErrorRpcRetry
+    | LogEntryErrorRpcFailure
+    | LogEntryErrorRpcUnhandled;
+};
+
+type LogEntryDebugEntryIncomingRequest = {
+  type: "incoming-request";
+  requestId: number;
+  ip: string;
+  method: string;
+};
+
+type LogEntryDebugEntryForwardRequest = {
+  type: "rpc-forward";
+  attemptNumber: number;
+  endpoint: string;
+  method: string;
+  status: "success" | "error";
+};
+
+type LogEntryDebugEntryCacheHit = {
+  type: "cache-hit";
+  requestId: number;
+  method: string;
+};
+
+type LogEntryDebugEntryCacheMiss = {
+  type: "cache-miss";
+  requestId: number;
+  method: string;
+};
+
+type LogEntryDebugRequestSuccessfull = {
+  type: "request-success";
+  requestId: number;
+  method: string;
+};
+
+type LogEntryDebug = {
+  type: "debug";
+  timestamp: number;
+  entry:
+    | LogEntryDebugEntryIncomingRequest
+    | LogEntryDebugEntryForwardRequest
+    | LogEntryDebugEntryCacheHit
+    | LogEntryDebugEntryCacheMiss
+    | LogEntryDebugRequestSuccessfull;
+};
+
+export type LogEntry = LogEntryInfo | LogEntryError | LogEntryDebug;
