@@ -105,6 +105,7 @@ abstract class BaseBalancer implements Balancer {
     }, this.healthCheckInterval);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getWeightForEndpoint(endpoint: string): number | undefined {
     return undefined;
   }
