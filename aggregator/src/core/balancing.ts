@@ -2,8 +2,6 @@ import { HttpConfig, NetworkOptions, WeightedEndpoint } from "../types";
 import { Balancer } from "../lib/interfaces";
 import { config, engine } from "..";
 
-const cf = config.getConfig();
-
 export function createBalancer(
   httpConfig: HttpConfig,
   network: NetworkOptions
@@ -40,6 +38,7 @@ abstract class BaseBalancer implements Balancer {
   }
 
   private startHealthCheck() {
+    const cf = config.getConfig();
     this.targets.forEach((target) => this.healthyTargets.add(target));
     setInterval(async () => {
       engine.addLog({
@@ -181,6 +180,7 @@ export class LeastLatencyBalancer extends BaseBalancer {
   }
 
   private async measureLatencies() {
+    const cf = config.getConfig();
     engine.addLog({
       type: "info",
       entry: "Measuring endpoint latencies...",
