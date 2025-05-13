@@ -1,5 +1,6 @@
 import Fastify, { FastifyInstance } from "fastify";
 import { HttpServerOptions } from "../types";
+import cors from "@fastify/cors";
 import { validateRequestBody } from "../utils/validate";
 import { handleRequest } from "../utils/requestHandler";
 import { apiRouteGroup } from "../api/routes/dashboardRouteGroup";
@@ -9,6 +10,14 @@ export async function initHTTPServer(
   options: HttpServerOptions
 ): Promise<FastifyInstance> {
   const httpServer = Fastify({ logger: true });
+
+  // ✅ Register CORS plugin
+  await httpServer.register(cors, {
+    origin: "http://localhost:3000", // <-- your frontend URL during dev
+    methods: ["GET", "POST", "PUT", "DELETE"], // adjust as needed
+    credentials: true,
+  });
+  
   const handler = await handleRequest(options);
 
   httpServer.register((fastify, _, done) => {

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { getRequestRates } from "@/lib/dashboard";
 import {
   Card,
   CardContent,
@@ -41,6 +43,26 @@ import {
 import SearchBar from "@/components/SearchBar";
 
 export default function Analytics() {
+  const [totalRequest, setTotalRequest] = useState("0");
+  const [errorRate, setErrorRate] = useState("0%");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchRequestRates() {
+      try {
+        const res = await getRequestRates();
+        setTotalRequest(`${res.data.totalRequests}`);
+        setErrorRate(`${res.data.errorRate}%`);
+      } catch (error) {
+        console.error("Failed to load request rates:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchRequestRates();
+  }, []);
+
   return (
     <div className="space-y-6 text-white bg-[#050816] px-6 pt-16">
       <SearchBar />
@@ -54,15 +76,25 @@ export default function Analytics() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="bg-black text-white custom-get-started-button">
+          <Button
+            variant="outline"
+            className="bg-black text-white custom-get-started-button"
+          >
             <Calendar className="mr-2 h-4 w-4" />
             Last 7 Days
           </Button>
-          <Button variant="outline" className="bg-black text-white custom-get-started-button">
+          <Button
+            variant="outline"
+            className="bg-black text-white custom-get-started-button"
+          >
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button variant="outline" size="icon" className="bg-black text-white custom-get-started-button">
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-black text-white custom-get-started-button"
+          >
             <RefreshCw className="h-4 w-4" />
           </Button>
         </div>
@@ -77,7 +109,7 @@ export default function Analytics() {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,284,293</div>
+            <div className="text-2xl font-bold">{totalRequest}</div>
             <p className="text-xs text-muted-foreground">
               +12.5% from last week
             </p>
@@ -97,18 +129,20 @@ export default function Analytics() {
             </p>
           </CardContent>
         </Card>
+
         <Card className="bg-black text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Error Rate</CardTitle>
             <LineChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0.42%</div>
+            <div className="text-2xl font-bold">{loading ? "Loading..." : errorRate}</div>
             <p className="text-xs text-muted-foreground">
               +0.1% from last week
             </p>
           </CardContent>
         </Card>
+
         <Card className="bg-black text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">

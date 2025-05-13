@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -21,78 +21,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Plus } from "lucide-react";
+import { Endpoint } from "@/types/dashboard";
 
-type EndpointType = "Public" | "Private" | "Hosted";
-type NetworkType = "Mainnet-Beta" | "Devnet";
-
-interface Endpoint {
-  id: string;
-  url: string;
-  type: EndpointType;
-  network: NetworkType;
-  status: "Online" | "Offline" | "Degraded";
-  latency: number;
-  weight: number;
-  enabled: boolean;
+interface EndpointListProps {
+  endpoints: Endpoint[];
 }
 
-export function EndpointList() {
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([
-    {
-      id: "1",
-      url: "https://api.mainnet-beta.solana.com",
-      type: "Public",
-      network: "Mainnet-Beta",
-      status: "Online",
-      latency: 132,
-      weight: 1,
-      enabled: true,
-    },
-    {
-      id: "2",
-      url: "https://solana-api.projectserum.com",
-      type: "Public",
-      network: "Mainnet-Beta",
-      status: "Online",
-      latency: 145,
-      weight: 1,
-      enabled: true,
-    },
-    {
-      id: "3",
-      url: "https://rpc.ankr.com/solana",
-      type: "Public",
-      network: "Mainnet-Beta",
-      status: "Degraded",
-      latency: 210,
-      weight: 0.5,
-      enabled: true,
-    },
-    {
-      id: "4",
-      url: "https://api.devnet.solana.com",
-      type: "Public",
-      network: "Devnet",
-      status: "Online",
-      latency: 118,
-      weight: 1,
-      enabled: true,
-    },
-    {
-      id: "5",
-      url: "https://my-private-rpc.example.com",
-      type: "Private",
-      network: "Mainnet-Beta",
-      status: "Offline",
-      latency: 0,
-      weight: 2,
-      enabled: false,
-    },
-  ]);
+export function EndpointList({ endpoints }: EndpointListProps) {
+  const [localEndpoints, setLocalEndpoints] = useState<Endpoint[]>(endpoints);
+
+  useEffect(() => {
+    setLocalEndpoints(endpoints);
+  }, [endpoints]);
 
   const toggleEndpoint = (id: string) => {
-    setEndpoints(
-      endpoints.map((endpoint) =>
+    setLocalEndpoints(
+      localEndpoints.map((endpoint) =>
         endpoint.id === id
           ? { ...endpoint, enabled: !endpoint.enabled }
           : endpoint
@@ -125,14 +69,14 @@ export function EndpointList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {endpoints.map((endpoint) => (
+            {localEndpoints.map((endpoint) => (
               <TableRow key={endpoint.id}>
                 <TableCell className="font-mono text-xs">
                   {endpoint.url}
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="text-white">
-                    {endpoint.type}{" "}
+                    {endpoint.type}
                   </Badge>
                 </TableCell>
                 <TableCell>{endpoint.network}</TableCell>
