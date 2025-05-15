@@ -4,6 +4,7 @@ import { validateRequestBody } from "../utils/validate";
 import { handleRequest } from "../utils/requestHandler";
 import { apiRouteGroup } from "../api/routes/dashboardRouteGroup";
 import { engine } from "..";
+import cors from "@fastify/cors";
 
 export async function initHTTPServer(
   options: HttpServerOptions
@@ -11,6 +12,11 @@ export async function initHTTPServer(
   const httpServer = Fastify({ logger: true });
 
   const handler = await handleRequest(options);
+
+  await httpServer.register(cors, {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  });
 
   httpServer.register((fastify, _, done) => {
     fastify.post("/", {

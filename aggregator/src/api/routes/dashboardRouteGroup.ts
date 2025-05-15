@@ -9,31 +9,41 @@ export const apiRouteGroup: FastifyPluginCallback = (fastify) => {
     config.updateConfig(newConfig);
     server.restart(config.getConfig());
 
-    reply.code(200).send({ message: "Config updated and server restarted" });
+    reply.code(200).send({
+      message: "Config updated and server restarted",
+      config: config.getConfig(),
+    });
+  });
+
+  fastify.get("/config", async (request, reply) => {
+    const cfg = config.getConfig();
+
+    reply.code(200).send({ config: cfg });
   });
 
   fastify.get("/top-methods", async (request, reply) => {
     const queryParams = request.query;
     const limit = (queryParams as any).limit as number;
 
-    if (limit) return reply.code(200).send(engine.getTopRpcMethods(limit));
+    if (limit)
+      return reply.code(200).send({ methods: engine.getTopRpcMethods(limit) });
 
-    reply.code(200).send(engine.getTopRpcMethods());
+    reply.code(200).send({ methods: engine.getTopRpcMethods() });
   });
 
   fastify.get("/endpoints", async (request, reply) => {
     const endpointsData = engine.getAllEndpointsData();
-    reply.code(200).send(endpointsData);
+    reply.code(200).send({ endpointsData: endpointsData });
   });
 
   fastify.get("/endpoints/all", async (_, reply) => {
     const endpoints = config.getConfig().balancingOptions.http.endpoints;
-    reply.code(200).send(endpoints);
+    reply.code(200).send({ endpoints });
   });
 
   fastify.get("/logs", async (_, reply) => {
     const logs = engine.getLogs();
-    reply.code(200).send(logs);
+    reply.code(200).send({ logs });
   });
 
   fastify.get("/requests", async (request, reply) => {
@@ -55,8 +65,8 @@ export const apiRouteGroup: FastifyPluginCallback = (fastify) => {
     reply.code(200).send({ successRate, errorRate });
   });
 
-  fastify.get("/response-latency", async (request, reply) => {
+  fastify.get("/response-latencies", async (request, reply) => {
     const responseLatencies = engine.getResponseLatencies();
-    reply.code(200).send(responseLatencies);
+    reply.code(200).send({ responseLatencies });
   });
 };

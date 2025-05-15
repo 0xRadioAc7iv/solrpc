@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { HttpServerOptions, ValidRequestBody } from "../types";
+import { HTTP_METHODS, HttpServerOptions, ValidRequestBody } from "../types";
 import { getCachePolicyForMethod } from "./cachePolicy";
 import { requestsWithRetry } from "../utils/requestRetry";
 
@@ -19,6 +19,12 @@ export async function handleRequest({
       const paramKey = body.params ? JSON.stringify(body.params) : "";
 
       engine.updateRpcMethodCount(body.method);
+
+      if (!HTTP_METHODS.includes(body.method)) {
+        return reply
+          .code(400)
+          .send({ error: `Invalid Method Name: ${body.method}` });
+      }
 
       method = body.method;
       requestId = body.id;

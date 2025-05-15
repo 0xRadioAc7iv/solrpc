@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getRequestRates } from "@/lib/dashboard";
 import {
   Card,
   CardContent,
@@ -41,27 +39,11 @@ import {
   Trash2,
 } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
+import { useStatsStore } from "@/lib/store";
 
 export default function Analytics() {
-  const [totalRequest, setTotalRequest] = useState("0");
-  const [errorRate, setErrorRate] = useState("0%");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchRequestRates() {
-      try {
-        const res = await getRequestRates();
-        setTotalRequest(`${res.data.totalRequests}`);
-        setErrorRate(`${res.data.errorRate}%`);
-      } catch (error) {
-        console.error("Failed to load request rates:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchRequestRates();
-  }, []);
+  const { requestData, requestErrorRate, responseLatencies, logs } =
+    useStatsStore();
 
   return (
     <div className="space-y-6 text-white bg-[#050816] px-6 pt-16">
@@ -109,7 +91,7 @@ export default function Analytics() {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalRequest}</div>
+            <div className="text-2xl font-bold">{requestData?.length}</div>
             <p className="text-xs text-muted-foreground">
               +12.5% from last week
             </p>
@@ -123,7 +105,16 @@ export default function Analytics() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">54ms</div>
+            <div className="text-2xl font-bold">
+              {responseLatencies.length > 0
+                ? (
+                    responseLatencies.reduce(
+                      (sum, item) => sum + item.latency,
+                      0
+                    ) / responseLatencies.length
+                  ).toFixed(2)
+                : 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               -8.3% from last week
             </p>
@@ -136,7 +127,9 @@ export default function Analytics() {
             <LineChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{loading ? "Loading..." : errorRate}</div>
+            <div className="text-2xl font-bold">
+              {requestErrorRate > 0 ? requestErrorRate : 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               +0.1% from last week
             </p>
@@ -428,84 +421,19 @@ export default function Analytics() {
             </CardHeader>
             <CardContent>
               <div className="h-[400px] rounded-md bg-black p-4 font-mono text-xs text-green-400 overflow-auto">
-                <div className="space-y-2">
-                  <div>
-                    [2023-09-15 14:35:22] [INFO] Server started on port 8899
-                  </div>
-                  <div>
-                    [2023-09-15 14:35:23] [INFO] Connected to Mainnet RPC 1
-                  </div>
-                  <div>
-                    [2023-09-15 14:35:23] [INFO] Connected to Mainnet RPC 2
-                  </div>
-                  <div>
-                    [2023-09-15 14:35:24] [WARN] Slow response from Mainnet RPC
-                    3 (245ms)
-                  </div>
-                  <div>
-                    [2023-09-15 14:35:25] [INFO] Connected to Mainnet RPC 3
-                  </div>
-                  <div>
-                    [2023-09-15 14:35:30] [INFO] Health check completed for all
-                    endpoints
-                  </div>
-                  <div>
-                    [2023-09-15 14:35:45] [INFO] Processed 128 requests in the
-                    last minute
-                  </div>
-                  <div>
-                    [2023-09-15 14:36:12] [ERROR] Mainnet RPC 3 connection
-                    timeout
-                  </div>
-                  <div>
-                    [2023-09-15 14:36:15] [INFO] Failover activated: Routing
-                    traffic from Mainnet RPC 3 to Mainnet RPC 1
-                  </div>
-                  <div>
-                    [2023-09-15 14:36:30] [INFO] Health check completed for all
-                    endpoints
-                  </div>
-                  <div>
-                    [2023-09-15 14:36:45] [INFO] Processed 142 requests in the
-                    last minute
-                  </div>
-                  <div>
-                    [2023-09-15 14:37:10] [INFO] Attempting to reconnect to
-                    Mainnet RPC 3
-                  </div>
-                  <div>
-                    [2023-09-15 14:37:12] [INFO] Successfully reconnected to
-                    Mainnet RPC 3
-                  </div>
-                  <div>
-                    [2023-09-15 14:37:15] [INFO] Restored traffic to Mainnet RPC
-                    3
-                  </div>
-                  <div>
-                    [2023-09-15 14:37:30] [INFO] Health check completed for all
-                    endpoints
-                  </div>
-                  <div>
-                    [2023-09-15 14:37:45] [INFO] Processed 156 requests in the
-                    last minute
-                  </div>
-                  <div>
-                    [2023-09-15 14:38:22] [WARN] Detected high request volume
-                    from IP 192.168.1.108
-                  </div>
-                  <div>
-                    [2023-09-15 14:38:30] [INFO] Health check completed for all
-                    endpoints
-                  </div>
-                  <div>
-                    [2023-09-15 14:38:45] [INFO] Processed 189 requests in the
-                    last minute
-                  </div>
-                  <div>
-                    [2023-09-15 14:39:15] [INFO] Applied rate limiting to IP
-                    192.168.1.108
-                  </div>
-                </div>
+                {logs.map((log, index) => {
+                  return (
+                    <div id={index.toString()}>
+                      <div>
+                        [{new Date(log.timestamp).toISOString().toString()}] [
+                        {log.type}]{" "}
+                        {typeof log.entry === "object"
+                          ? log.entry.type
+                          : log.entry}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

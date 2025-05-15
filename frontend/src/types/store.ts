@@ -1,9 +1,5 @@
-import { MemcachedCache, MemoryCache, RedisCache } from "../core/caching";
-import { StatEngine } from "../core/stats";
-import { Balancer } from "../lib/interfaces";
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const HTTP_METHODS = [
+const HTTP_METHODS = [
   "getBlock",
   "getTransaction",
   "getEpochSchedule",
@@ -70,55 +66,28 @@ type CacheMemcached = { type: "memcached"; url: string };
 
 export type CachingMethods = CacheMemory | CacheRedis | CacheMemcached;
 
-export type CacheEntry = {
-  value: string;
-  expiresAt: number;
-};
-
-export type CachePolicy =
-  | {
-      cacheable: true;
-      ttlMs: number;
-      finalizedOnly?: boolean;
-    }
-  | {
-      cacheable: false;
-    };
-
 type LoadBalancingMethods =
   | "round-robin"
   | "least-connections"
   | "least-latency"
   | "weighted";
 
-type Cache = MemoryCache | RedisCache | MemcachedCache;
-
-export type HttpServerOptions = {
-  cache: Cache;
-  maxRetries: number;
-  balancer: Balancer;
-  engine: StatEngine;
-};
-
-export type ValidRequestBody = {
-  jsonrpc: "2.0";
-  id: number;
-  method: HttpMethods;
-  params: any;
-};
-
 export type WeightedEndpoint = { url: string; weight: number };
 
 type SimpleEndpoint = string;
 
+type WeightedEndpointRecord = Record<NetworkOptions, WeightedEndpoint[]>;
+
+type SimpleEndpointRecord = Record<NetworkOptions, SimpleEndpoint[]>;
+
 export type HttpConfig =
   | {
       method: "weighted";
-      endpoints: Record<NetworkOptions, WeightedEndpoint[]>;
+      endpoints: WeightedEndpointRecord;
     }
   | {
       method: Exclude<LoadBalancingMethods, "weighted">;
-      endpoints: Record<NetworkOptions, SimpleEndpoint[]>;
+      endpoints: SimpleEndpointRecord;
     };
 
 export type BalancingOptions = { http: HttpConfig };
@@ -129,6 +98,15 @@ export type ConfigOptions = {
   cachingMethod: CachingMethods;
   maxRetries?: number;
 };
+
+export type StatEndpointsData = {
+  network: NetworkOptions;
+  latency: number;
+  weight?: number;
+  isActive: boolean;
+};
+
+export type EndpointsType = WeightedEndpointRecord | SimpleEndpointRecord;
 
 type LogEntryInfo = {
   type: "info";
@@ -218,11 +196,6 @@ type LogEntryDebug = {
 
 export type LogEntry = LogEntryInfo | LogEntryError | LogEntryDebug;
 
-export type StatRequestData = {
-  requestId: number;
-  timestamp: number;
-};
-
 export type StatResponseLatency = {
   latency: number;
   timestamp: number;
@@ -230,9 +203,37 @@ export type StatResponseLatency = {
   success: boolean;
 };
 
-export type StatEndpointsData = {
-  network: NetworkOptions;
-  latency: number;
-  weight?: number;
-  isActive: boolean;
+export type StatsStore = {
+  serverURL: string;
+  config: ConfigOptions | null;
+
+  topRpcMethods: Array<{ method: HttpMethods; count: number }>;
+  endpointsData: Array<{ key: string; value: StatEndpointsData }>;
+  endpoints: EndpointsType | null;
+  logs: Array<LogEntry>;
+  requestData: {
+    requests: Array<{
+      requestId: number;
+      timestamp: number;
+    }>;
+    length: number;
+  } | null;
+  requestSuccessRate: number;
+  requestErrorRate: number;
+  responseLatencies: Array<StatResponseLatency>;
+
+  setServerURL: (url: string) => void;
+
+  getConfig: () => Promise<void>;
+  getTopRpcMethods: (limit?: number) => Promise<void>;
+  getEndpointsData: () => Promise<void>;
+  getEndpointsList: () => Promise<void>;
+  getLogs: () => Promise<void>;
+  getRequestData: (limit?: number) => Promise<void>;
+  getRequestRates: () => Promise<void>;
+  getResponseLatencies: () => Promise<void>;
+
+  updateConfig: (config: ConfigOptions) => Promise<void>;
+
+  fetchAll: () => Promise<void>;
 };
