@@ -19,14 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  BarChart,
-  CheckCircle,
-  Info,
-  RefreshCw,
-  Save,
-  Server,
-} from "lucide-react";
+import { BarChart, CheckCircle, Info, RefreshCw, Save, Server } from 'lucide-react';
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 
@@ -36,18 +29,21 @@ export default function LoadBalancing() {
   const [algorithm, setAlgorithm] = useState("round-robin");
 
   return (
-    <div className="space-y-6 text-white bg-[#050816] px-6 pt-16">
-      <SearchBar />
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6 text-white bg-[#050816] px-3 sm:px-6 pt-6 sm:pt-16">
+      <div className="w-full">
+        <SearchBar />
+      </div>
+      
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight instrument-serif-regular-italic mt-3">
+          <h1 className="text-xl sm:text-2xl font-normal tracking-tight inter mt-2 sm:mt-3">
             Load Balancing
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground mt-2 sm:mt-5">
             Configure how requests are distributed across RPC endpoints
           </p>
         </div>
-        <Button className="custom-get-started-button">
+        <Button className="custom-get-started-button w-full sm:w-auto">
           <RefreshCw className="mr-2 h-4 w-4" />
           Refresh Status
         </Button>
@@ -57,29 +53,31 @@ export default function LoadBalancing() {
         defaultValue="settings"
         className="space-y-4 bg-slate-950 text-white"
       >
-        <TabsList>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-          <TabsTrigger value="health">Health Checks</TabsTrigger>
-          <TabsTrigger value="metrics">Metrics</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-2">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="settings" className="flex-1 sm:flex-initial">Settings</TabsTrigger>
+            <TabsTrigger value="health" className="flex-1 sm:flex-initial">Health Checks</TabsTrigger>
+            <TabsTrigger value="metrics" className="flex-1 sm:flex-initial">Metrics</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="settings" className="space-y-4">
-          <Card className="bg-black text-white border border-gray-800">
-            <CardHeader>
-              <CardTitle className="flex items-center">
+          <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="flex items-center text-lg sm:text-xl">
                 <Server className="mr-2 h-5 w-5" />
                 Load Balancing Configuration
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Configure how requests are distributed across multiple RPC
                 endpoints
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
+            <CardContent className="space-y-6 px-4 sm:px-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="space-y-0.5">
                   <h3 className="font-medium">Enable Load Balancing</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Distribute requests across multiple endpoints
                   </p>
                 </div>
@@ -104,7 +102,7 @@ export default function LoadBalancing() {
                     <SelectItem value="response-time">Response Time</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {algorithm === "round-robin" &&
                     "Distributes requests sequentially across all endpoints"}
                   {algorithm === "weighted" &&
@@ -119,10 +117,10 @@ export default function LoadBalancing() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Failover Threshold</h3>
-                  <Badge variant="outline">3 failures</Badge>
+                  <Badge className="memcached text-xs">3 failures</Badge>
                 </div>
                 <Slider defaultValue={[3]} max={10} step={1} className="py-4" />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Number of failures before an endpoint is marked as down
                 </p>
               </div>
@@ -132,7 +130,7 @@ export default function LoadBalancing() {
                   <h3 className="font-medium">Auto Recovery</h3>
                   <Switch defaultChecked />
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Automatically recover endpoints after they become healthy
                   again
                 </p>
@@ -145,14 +143,14 @@ export default function LoadBalancing() {
             </CardContent>
           </Card>
 
-          <Card className="bg-black text-white border border-gray-800">
-            <CardHeader>
-              <CardTitle>Active Endpoints</CardTitle>
-              <CardDescription>
+          <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="text-lg sm:text-xl">Active Endpoints</CardTitle>
+              <CardDescription className="text-sm">
                 Endpoints currently included in the load balancing pool
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 sm:px-6">
               <div className="space-y-4">
                 {[
                   {
@@ -176,14 +174,14 @@ export default function LoadBalancing() {
                 ].map((endpoint, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3 last:border-0 last:pb-0"
                   >
                     <div className="space-y-1">
-                      <div className="flex items-center">
+                      <div className="flex flex-wrap items-center gap-2">
                         <h4 className="font-medium">{endpoint.name}</h4>
                         {endpoint.status === "healthy" ? (
                           <Badge
-                            className="ml-2 bg-green-500"
+                            className="active text-xs"
                             variant="secondary"
                           >
                             <CheckCircle className="mr-1 h-3 w-3" />
@@ -191,7 +189,7 @@ export default function LoadBalancing() {
                           </Badge>
                         ) : (
                           <Badge
-                            className="ml-2 bg-yellow-500"
+                            className="available text-xs"
                             variant="secondary"
                           >
                             <Info className="mr-1 h-3 w-3" />
@@ -199,18 +197,18 @@ export default function LoadBalancing() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         Latency: {endpoint.latency} • Weight: {endpoint.weight}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="bg-black text-white">
+                    <div className="flex items-center gap-2 self-end sm:self-auto">
+                      <Button variant="outline" size="sm" className="bg-gray-900 text-white border border-gray-700 cursor-pointer hover:bg-gray-600 hover:text-slate-500 font-normal text-xs h-8">
                         Edit
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-destructive"
+                        className="text-destructive bg-red-200 cursor-pointer font-sans text-xs h-8"
                       >
                         Remove
                       </Button>
@@ -223,18 +221,18 @@ export default function LoadBalancing() {
         </TabsContent>
 
         <TabsContent value="health" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Health Check Configuration</CardTitle>
-              <CardDescription>
+          <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="text-lg sm:text-xl">Health Check Configuration</CardTitle>
+              <CardDescription className="text-sm">
                 Configure how endpoint health is monitored
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 px-4 sm:px-6">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Health Check Interval</h3>
-                  <Badge variant="outline">{healthCheckInterval} seconds</Badge>
+                  <Badge variant="outline" className="text-xs">{healthCheckInterval} seconds</Badge>
                 </div>
                 <Slider
                   value={[healthCheckInterval]}
@@ -244,7 +242,7 @@ export default function LoadBalancing() {
                   step={5}
                   className="py-4"
                 />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   How frequently to check endpoint health
                 </p>
               </div>
@@ -266,7 +264,7 @@ export default function LoadBalancing() {
                     <SelectItem value="http">HTTP Status Check</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Method used to determine if an endpoint is healthy
                 </p>
               </div>
@@ -274,7 +272,7 @@ export default function LoadBalancing() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Timeout Threshold</h3>
-                  <Badge variant="outline">2000ms</Badge>
+                  <Badge variant="outline" className="text-xs">2000ms</Badge>
                 </div>
                 <Slider
                   defaultValue={[2000]}
@@ -283,12 +281,12 @@ export default function LoadBalancing() {
                   step={500}
                   className="py-4"
                 />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Maximum time to wait for health check response
                 </p>
               </div>
 
-              <Button className="w-full">
+              <Button className="w-full custom-get-started-button">
                 <Save className="mr-2 h-4 w-4" />
                 Save Health Check Settings
               </Button>
@@ -297,19 +295,19 @@ export default function LoadBalancing() {
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
+          <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="flex items-center text-lg sm:text-xl">
                 <BarChart className="mr-2 h-5 w-5" />
                 Load Distribution Metrics
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 View how requests are being distributed across endpoints
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px] rounded-md border p-4 flex items-center justify-center">
-                <p className="text-muted-foreground">
+            <CardContent className="px-4 sm:px-6">
+              <div className="h-[200px] sm:h-[300px] rounded-md border p-4 flex items-center justify-center">
+                <p className="text-xs sm:text-sm text-muted-foreground text-center">
                   Load distribution chart will appear here
                 </p>
               </div>

@@ -68,10 +68,10 @@ export default function Analytics() {
       <SearchBar />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight instrument-serif-regular-italic mt-3">
+          <h1 className="text-2xl font-normal tracking-tight inter mt-3 ">
             Analytics & Logs
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mt-5">
             Monitor RPC usage and performance metrics
           </p>
         </div>
@@ -100,8 +100,8 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-black text-white">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="custom-glow text-white rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Requests
@@ -115,7 +115,7 @@ export default function Analytics() {
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-black text-white">
+        <Card className="custom-glow text-white rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Average Response Time
@@ -130,20 +130,22 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card className="bg-black text-white">
+        <Card className="custom-glow text-white rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Error Rate</CardTitle>
             <LineChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{loading ? "Loading..." : errorRate}</div>
+            <div className="text-2xl font-bold">
+              {loading ? "Loading..." : errorRate}
+            </div>
             <p className="text-xs text-muted-foreground">
               +0.1% from last week
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-black text-white">
+        <Card className="custom-glow text-white rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Blocked Requests
@@ -168,7 +170,7 @@ export default function Analytics() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <Card className="bg-black text-white">
+          <Card className=" text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20">
             <CardHeader>
               <CardTitle>Request Volume</CardTitle>
               <CardDescription>
@@ -185,7 +187,7 @@ export default function Analytics() {
           </Card>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Card className="bg-black text-white">
+            <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
               <CardHeader>
                 <CardTitle>Top RPC Methods</CardTitle>
                 <CardDescription>
@@ -201,7 +203,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
 
-            <Card className="bg-black text-white">
+            <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
               <CardHeader>
                 <CardTitle>Endpoint Performance</CardTitle>
                 <CardDescription>
@@ -234,7 +236,7 @@ export default function Analytics() {
             </Button>
           </div>
 
-          <Card>
+          <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
             <CardHeader>
               <CardTitle>Recent Requests</CardTitle>
               <CardDescription>
@@ -245,12 +247,12 @@ export default function Analytics() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Method</TableHead>
-                    <TableHead>Endpoint</TableHead>
-                    <TableHead>Response Time</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>IP Address</TableHead>
+                    <TableHead className="text-white">Time</TableHead>
+                    <TableHead className="text-white">Method</TableHead>
+                    <TableHead className="text-white">Endpoint</TableHead>
+                    <TableHead className="text-white">Response Time</TableHead>
+                    <TableHead className="text-white">Status</TableHead>
+                    <TableHead className="text-white">IP Address</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -307,11 +309,11 @@ export default function Analytics() {
                       <TableCell>{request.responseTime}</TableCell>
                       <TableCell>
                         {request.status === "success" ? (
-                          <Badge className="bg-green-500" variant="secondary">
+                          <Badge className="active" variant="secondary">
                             Success
                           </Badge>
                         ) : (
-                          <Badge className="bg-red-500" variant="secondary">
+                          <Badge className="memcached" variant="secondary">
                             Error
                           </Badge>
                         )}
@@ -327,8 +329,8 @@ export default function Analytics() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="errors" className="space-y-4">
-          <Card>
+        <TabsContent value="errors" className="space-y-4 text-white">
+          <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
             <CardHeader>
               <CardTitle>Error Log</CardTitle>
               <CardDescription>Recent errors and exceptions</CardDescription>
@@ -374,10 +376,7 @@ export default function Analytics() {
                         {error.time}
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant="outline"
-                          className="text-red-500 border-red-500"
-                        >
+                        <Badge variant="outline" className="memcached">
                           {error.type}
                         </Badge>
                       </TableCell>
@@ -402,10 +401,10 @@ export default function Analytics() {
         <TabsContent value="logs" className="space-y-4">
           <div className="flex items-center space-x-2">
             <Select defaultValue="all">
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] custom-get-started-button">
                 <SelectValue placeholder="Log level" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="custom-get-started-button">
                 <SelectItem value="all">All Levels</SelectItem>
                 <SelectItem value="info">Info</SelectItem>
                 <SelectItem value="warn">Warning</SelectItem>
@@ -413,13 +412,16 @@ export default function Analytics() {
                 <SelectItem value="debug">Debug</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline">
-              <Trash2 className="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              className="text-red-600 bg-red-200 border border-red-900"
+            >
               Clear Logs
+              <Trash2 className="mr-2 h-4 w-4" />
             </Button>
           </div>
 
-          <Card>
+          <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
             <CardHeader>
               <CardTitle>System Logs</CardTitle>
               <CardDescription>
