@@ -55,10 +55,10 @@ export default function Endpoints() {
       <SearchBar />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-black tracking-tight instrument-serif-regular-italic mt-3">
+          <h1 className="text-2xl font-normal tracking-tight inter mt-3 ">
             Endpoints
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mt-5">
             Manage RPC endpoints for your blockchain networks
           </p>
         </div>
@@ -106,7 +106,7 @@ export default function Endpoints() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
-          <Card className="bg-black text-white border border-gray-800">
+          <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Database className="mr-2 h-5 w-5" />
@@ -120,13 +120,15 @@ export default function Endpoints() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Network</TableHead>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Latency</TableHead>
-                    <TableHead>Last Check</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-white">Name</TableHead>
+                    <TableHead className="text-white">Network</TableHead>
+                    <TableHead className="text-white">URL</TableHead>
+                    <TableHead className="text-white">Status</TableHead>
+                    <TableHead className="text-white">Latency</TableHead>
+                    <TableHead className="text-white">Last Check</TableHead>
+                    <TableHead className="text-right text-white">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -191,19 +193,21 @@ export default function Endpoints() {
                       </TableCell>
                       <TableCell>
                         {endpoint.status === "active" && (
-                          <Badge className="bg-green-500" variant="secondary">
+                          <Badge className="active" variant="secondary">
                             <CheckCircle className="mr-1 h-3 w-3" />
                             Active
                           </Badge>
                         )}
                         {endpoint.status === "degraded" && (
-                          <Badge className="bg-yellow-500" variant="secondary">
+                          <Badge className="available" variant="secondary">
                             <AlertCircle className="mr-1 h-3 w-3" />
                             Degraded
                           </Badge>
                         )}
                         {endpoint.status === "inactive" && (
-                          <Badge variant="outline">Inactive</Badge>
+                          <Badge className="memcached" variant="outline">
+                            Inactive
+                          </Badge>
                         )}
                       </TableCell>
                       <TableCell>{endpoint.latency}</TableCell>
@@ -246,19 +250,19 @@ export default function Endpoints() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="active" className="space-y-4 bg-black text-white">
-          <Card className="bg-black text-white">
+        <TabsContent value="active" className="space-y-4">
+          <Card className="text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 ">
             <CardContent className="pt-6">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Network</TableHead>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Latency</TableHead>
-                    <TableHead>Last Check</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-white">Name</TableHead>
+                    <TableHead className="text-white">Network</TableHead>
+                    <TableHead className="text-white">URL</TableHead>
+                    <TableHead className="text-white">Status</TableHead>
+                    <TableHead className="text-white">Latency</TableHead>
+                    <TableHead className="text-white">Last Check</TableHead>
+                    <TableHead className="text-right text-white">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -306,7 +310,7 @@ export default function Endpoints() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className="bg-green-500" variant="secondary">
+                        <Badge className="active" variant="secondary">
                           <CheckCircle className="mr-1 h-3 w-3" />
                           Active
                         </Badge>
@@ -331,18 +335,18 @@ export default function Endpoints() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="inactive" className="space-y-4 bg-black text-white">
-          <Card className="bg-black text-white">
+        <TabsContent value="inactive" className="space-y-4  ">
+          <Card className=" text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 ">
             <CardContent className="pt-6">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Network</TableHead>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Last Check</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-white">Name</TableHead>
+                    <TableHead className="text-white">Network</TableHead>
+                    <TableHead className="text-white">URL</TableHead>
+                    <TableHead className="text-white">Status</TableHead>
+                    <TableHead className="text-white">Last Check</TableHead>
+                    <TableHead className="text-right text-white">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -364,7 +368,9 @@ export default function Endpoints() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">Inactive</Badge>
+                      <Badge className="memcached" variant="outline">
+                        Inactive
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       <div className="flex items-center">
@@ -384,19 +390,19 @@ export default function Endpoints() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="degraded" className="space-y-4 bg-black text-white">
-          <Card className="bg-black text-white">
+        <TabsContent value="degraded" className="space-y-4 text-white">
+          <Card className=" text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 ">
             <CardContent className="pt-6">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Network</TableHead>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Latency</TableHead>
-                    <TableHead>Last Check</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                  <TableRow className="text-white">
+                    <TableHead className="text-white">Name</TableHead>
+                    <TableHead className="text-white">Network</TableHead>
+                    <TableHead className="text-white">URL</TableHead>
+                    <TableHead className="text-white">Status</TableHead>
+                    <TableHead className="text-white">Latency</TableHead>
+                    <TableHead className="text-white">Last Check</TableHead>
+                    <TableHead className="text-right text-white">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -418,7 +424,7 @@ export default function Endpoints() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className="bg-yellow-500" variant="secondary">
+                      <Badge className="available" variant="secondary">
                         <AlertCircle className="mr-1 h-3 w-3" />
                         Degraded
                       </Badge>

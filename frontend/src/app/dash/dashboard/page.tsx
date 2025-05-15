@@ -90,7 +90,7 @@ export default function Home() {
     <div className="border border-black text-white pt-16 bg-[#050816] px-6">
       <SearchBar />
       <div>
-        <h1 className="text-4xl font-normal tracking-tight inter mt-3 ">
+        <h1 className="text-2xl font-normal tracking-tight inter mt-3 ">
           Dashboard
         </h1>
         <p className="text-muted-foreground mt-5">
@@ -98,7 +98,7 @@ export default function Home() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 py-3">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4 py-3">
         <Card className="custom-glow text-white rounded-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-medium">

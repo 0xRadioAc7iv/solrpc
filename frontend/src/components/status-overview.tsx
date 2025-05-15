@@ -21,7 +21,9 @@ export function StatusOverview() {
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">System Status</h2>
+        <h2 className="text-lg font-normal text-slate-300 inter">
+          System Status
+        </h2>
         <Select defaultValue="mainnet">
           <SelectTrigger className="w-[180px] custom-get-started-button">
             <SelectValue placeholder="Select network" />
@@ -33,8 +35,8 @@ export function StatusOverview() {
         </Select>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="bg-black border border-gray-800 text-white">
+      <div className="grid gap-3 md:grid-cols-2">
+        <Card className="bg-purple-600/2 backdrop-blur-lg shadow-xl border border-purple-800/20 text-white">
           <CardHeader>
             <CardTitle className="text-base">Load Balancing</CardTitle>
             <CardDescription>
@@ -48,34 +50,36 @@ export function StatusOverview() {
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>Round-Robin</span>
                 </div>
-                <Badge variant="outline">Available</Badge>
+                <Badge className="available font-normal inter">Available</Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>Least Connections</span>
                 </div>
-                <Badge variant="outline">Available</Badge>
+                <Badge className="available font-normal inter ">
+                  Available
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>Least Response Time</span>
                 </div>
-                <Badge variant="secondary">Active</Badge>
+                <Badge className="active font-normal">Active</Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>Weighted</span>
                 </div>
-                <Badge variant="outline">Available</Badge>
+                <Badge className="available font-normal inter">Available</Badge>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-black border border-gray-800 text-white">
+        <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20  text-white">
           <CardHeader>
             <CardTitle className="text-base">Caching Status</CardTitle>
             <CardDescription>Current method: In-Memory</CardDescription>
@@ -87,14 +91,14 @@ export function StatusOverview() {
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>In-Memory</span>
                 </div>
-                <Badge variant="secondary">Active</Badge>
+                <Badge className="active">Active</Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-yellow-500" />
                   <span>Redis</span>
                 </div>
-                <Badge variant="outline" className="text-white">
+                <Badge className="text-white not-configured">
                   Not Configured
                 </Badge>
               </div>
@@ -103,7 +107,7 @@ export function StatusOverview() {
                   <XCircle className="h-5 w-5 text-red-500" />
                   <span>Memcached</span>
                 </div>
-                <Badge variant="outline" className="text-white">
+                <Badge className="text-white memcached">
                   Disabled
                 </Badge>
               </div>

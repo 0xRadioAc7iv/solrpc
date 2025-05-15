@@ -38,10 +38,10 @@ export default function SettingsPage() {
     <div className="space-y-6 text-white bg-[#050816] px-6 pt-16">
       <SearchBar />
       <div>
-        <h1 className="text-4xl font-bold tracking-tight instrument-serif-regular-italic mt-3">
+        <h1 className="text-2xl font-normal tracking-tight inter mt-3 ">
           Settings
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mt-5">
           Manage your RPC aggregator settings and preferences
         </p>
       </div>
@@ -56,7 +56,7 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="general" className="space-y-4">
-          <Card className="bg-black text-white border border-gray-700">
+          <Card className="text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <SettingsIcon className="mr-2 h-5 w-5" />
@@ -70,7 +70,7 @@ export default function SettingsPage() {
               <div className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="instance-name">Instance Name</Label>
-                  <Input id="instance-name" defaultValue="SolRPC Aggregator" />
+                  <Input id="instance-name" className="border border-gray-200" defaultValue="SolRPC Aggregator" />
                 </div>
 
                 <div className="grid gap-2">
@@ -87,32 +87,6 @@ export default function SettingsPage() {
                   </Select>
                 </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="theme">Theme</Label>
-                  <Select defaultValue="dark">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="timezone">Timezone</Label>
-                  <Select defaultValue="utc">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select timezone" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="utc">UTC</SelectItem>
-                      <SelectItem value="local">Local Time</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -132,7 +106,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-black text-white border border-gray-700">
+          <Card className="text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20">
             <CardHeader>
               <CardTitle>Cache Settings</CardTitle>
               <CardDescription>
