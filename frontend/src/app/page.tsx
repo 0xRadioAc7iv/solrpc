@@ -10,6 +10,17 @@ import { useRouter } from "next/navigation";
 import { ImDatabase } from "react-icons/im";
 import { GrNodes } from "react-icons/gr";
 import { SiSpeedypage } from "react-icons/si";
+import {
+  Network,
+  BarChart3,
+  Zap,
+  Shield,
+  ArrowRightLeft,
+  MoreHorizontal,
+  Cpu,
+  Server,
+  Gauge,
+} from "lucide-react";
 
 const features = [
   {
@@ -51,25 +62,32 @@ const features = [
 
 const endpoints = [
   {
-    url: "https://api.mainnet-beta.solana.com",
-    status: "Online",
+    url: "https://mainnet.solana-api.com/rpc",
     visibility: "Public",
-    latency: "132ms",
-    weight: 1,
+    status: "Online",
+    latency: "45ms",
+    weight: "1.0",
+  },
+  {
+    url: "https://solana-mainnet.phantom.tech/rpc",
+    visibility: "Private",
+    status: "Online",
+    latency: "52ms",
+    weight: "0.8",
+  },
+  {
+    url: "https://api.mainnet-beta.solana.com",
+    visibility: "Public",
+    status: "Online",
+    latency: "63ms",
+    weight: "0.7",
   },
   {
     url: "https://solana-api.projectserum.com",
+    visibility: "Public",
     status: "Online",
-    visibility: "Public",
-    latency: "145ms",
-    weight: 1,
-  },
-  {
-    url: "https://rpc.ankr.com/solana",
-    status: "Offline",
-    visibility: "Public",
-    latency: "210ms",
-    weight: 0.5,
+    latency: "78ms",
+    weight: "0.5",
   },
 ];
 
@@ -77,6 +95,20 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
+  const [animatedEndpoints, setAnimatedEndpoints] = useState(endpoints);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimatedEndpoints((prev) =>
+        prev.map((endpoint) => ({
+          ...endpoint,
+          latency: `${Math.floor(40 + Math.random() * 50)}ms`,
+        }))
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleClick = () => {
     router.push("/dash/dashboard");
@@ -192,7 +224,6 @@ export default function Home() {
           </div>
 
           <div className="w-2/3 h-[378px] px-8 py-8 flex flex-col bg-gradient-to-t from-purple-900/20 to-transparent text-white/80 rounded-sm shadow-xl relative overflow-hidden border border-slate-400/10">
-            {/* Background SVGs */}
             <Image
               src="ellipse4.svg"
               alt="ellipse background"
@@ -236,13 +267,6 @@ export default function Home() {
       </section>
 
       <section className="h-[100vh] bg-[#050816] overflow-hidden  flex items-center justify-center relative">
-        {/* Ripple circles - z-0 to stay behind */}
-        <div className="absolute z-0 mb-24">
-          <div className="ripple-circle animate-ripple1" />
-          <div className="ripple-circle animate-ripple2" />
-        </div>
-
-        {/* Content - z-10 to appear on top */}
         <div className="relative z-10 flex flex-col items-center">
           <Image
             src="/middle.svg"
@@ -264,24 +288,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative h-[207vh] bg-[#050816] z-0 overflow-hidden flex flex-col items-center justify-center">
+      <section className="relative h-[150vh] bg-[#050816] z-0 overflow-hidden flex flex-col items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-24 h-full flex flex-col">
-          {/* Random Stars Animation */}
-          <div className="absolute inset-0 pointer-events-none">
-            {stars.map((star) => (
-              <div
-                key={star.id}
-                className="absolute bg-white rounded-full opacity-70 animate-float"
-                style={{
-                  left: `${star.left}%`,
-                  bottom: "-20px",
-                  width: `${star.size}px`,
-                  height: `${star.size}px`,
-                  animationDelay: `${star.delay}s`,
-                }}
-              />
-            ))}
-          </div>
           {/* Heading */}
           <div className="text-center mb-16">
             <h2 className="text-4xl font-normal text-white mb-3 inter">
@@ -295,14 +303,72 @@ export default function Home() {
           </div>
 
           {/* Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 flex-1 px-20 z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 flex-1 px-4 md:px-20 z-10">
             {/* First row */}
-            <div className="bg-[#0a0a1f] rounded-lg overflow-hidden flex flex-col h-96 justify-between border border-[#1a1a3a]">
-              {/* Card 1 - Empty */}
+            <div className="bg-[#0a0a1f] relative rounded-lg overflow-hidden flex flex-col h-96 justify-between border border-[#1a1a3a] group">
+              <div
+                className="absolute bottom-0 left-1/2 w-full h-28 transform -translate-x-1/2 z-0 blur-2xl pointer-events-none"
+                style={{
+                  background:
+                    "radial-gradient(ellipse at bottom, rgba(168, 85, 247, 0.4), transparent 60%)",
+                }}
+              />
+
+              {/* Content */}
+              <div className="z-10 p-6 flex flex-col h-full">
+                <div className="mb-4">
+                  <div className="bg-purple-500/20 p-2 rounded-lg w-fit">
+                    <ArrowRightLeft className="w-6 h-6 text-purple-400" />
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-medium text-white mb-2">
+                  Intelligent Routing
+                </h2>
+                <p className="text-sm text-gray-400 mb-4">
+                  Auto-distributes traffic based on load, latency, and failures
+                  — no config needed.
+                </p>
+
+                <div className="mt-auto flex-1 flex items-end">
+                  <div className="w-full h-32 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="relative w-full">
+                        {/* Animated routing visualization */}
+                        <div className="flex justify-between items-center">
+                          <div className="bg-[#1a1a3a] h-16 w-16 rounded-lg flex items-center justify-center">
+                            <Cpu className="w-6 h-6 text-purple-400" />
+                          </div>
+
+                          <div className="flex-1 px-4 relative">
+                            <div className="h-0.5 bg-gradient-to-r from-purple-500/70 to-purple-500/20 w-full absolute top-1/2 transform -translate-y-1/2 group-hover:animate-pulse"></div>
+                            <div className="h-0.5 bg-gradient-to-r from-purple-500/50 to-purple-500/10 w-full absolute top-1/2 transform -translate-y-1/2 translate-y-2"></div>
+                            <div className="h-0.5 bg-gradient-to-r from-purple-500/30 to-purple-500/5 w-full absolute top-1/2 transform -translate-y-1/2 -translate-y-2"></div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="bg-[#1a1a3a] h-7 w-7 rounded-md flex items-center justify-center">
+                              <Server className="w-3 h-3 text-green-400" />
+                            </div>
+                            <div className="bg-[#1a1a3a] h-7 w-7 rounded-md flex items-center justify-center">
+                              <Server className="w-3 h-3 text-yellow-400" />
+                            </div>
+                            <div className="bg-[#1a1a3a] h-7 w-7 rounded-md flex items-center justify-center">
+                              <Server className="w-3 h-3 text-blue-400" />
+                            </div>
+                            <div className="bg-[#1a1a3a] h-7 w-7 rounded-md flex items-center justify-center">
+                              <Server className="w-3 h-3 text-purple-400" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-[#0a0a1f] relative rounded-lg overflow-hidden flex flex-col h-96 justify-between border border-[#1a1a3a]">
-              {/* Card 2 - Empty */}
+            <div className="bg-[#0a0a1f] relative rounded-lg overflow-hidden flex flex-col h-96 justify-between border border-[#1a1a3a] group">
               {/* Purple Glow */}
               <div
                 className="absolute bottom-0 left-1/2 w-full h-28 transform -translate-x-1/2 z-0 blur-2xl pointer-events-none"
@@ -311,6 +377,56 @@ export default function Home() {
                     "radial-gradient(ellipse at bottom, rgba(168, 85, 247, 0.4), transparent 60%)",
                 }}
               />
+
+              {/* Content */}
+              <div className="z-10 p-6 flex flex-col h-full">
+                <div className="mb-4">
+                  <div className="bg-purple-500/20 p-2 rounded-lg w-fit">
+                    <Shield className="w-6 h-6 text-purple-400" />
+                  </div>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-between">
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="relative w-full max-w-[200px] mx-auto">
+                      {/* Failover visualization */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-[#1a1a3a] h-16 rounded-lg flex items-center justify-center relative group-hover:opacity-30 transition-opacity duration-700">
+                          <Server className="w-6 h-6 text-red-400" />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                            <div className="w-8 h-0.5 bg-red-500 rotate-45"></div>
+                            <div className="w-8 h-0.5 bg-red-500 -rotate-45"></div>
+                          </div>
+                        </div>
+                        <div className="bg-[#1a1a3a] h-16 rounded-lg flex items-center justify-center">
+                          <Server className="w-6 h-6 text-green-400 group-hover:animate-pulse" />
+                        </div>
+                        <div className="bg-[#1a1a3a] h-16 rounded-lg flex items-center justify-center">
+                          <Server className="w-6 h-6 text-green-400 group-hover:animate-pulse" />
+                        </div>
+                        <div className="bg-[#1a1a3a] h-16 rounded-lg flex items-center justify-center">
+                          <Server className="w-6 h-6 text-green-400 group-hover:animate-pulse" />
+                        </div>
+                      </div>
+
+                      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-full">
+                        <div className="h-0.5 bg-gradient-to-b from-purple-500/70 to-purple-500/20 w-0.5 mx-auto h-8"></div>
+                        <div className="h-1 w-16 bg-purple-500/70 rounded-full mx-auto group-hover:animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right mt-8">
+                    <h2 className="text-xl font-medium text-white mb-2">
+                      Automatic Failover
+                    </h2>
+                    <p className="text-sm text-gray-400">
+                      If an RPC fails, traffic reroutes instantly. Zero
+                      downtime.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="bg-[#0a0a1f] relative rounded-lg overflow-hidden flex flex-col justify-between border border-[#1a1a3a] h-96 p-6 text-white">
@@ -325,38 +441,43 @@ export default function Home() {
 
               {/* Content */}
               <div className="z-10">
-                <h2 className="text-lg font-semibold">Title</h2>
-                <p className="text-sm text-gray-400">description</p>
+                <div className="mb-4">
+                  <div className="bg-purple-500/20 p-2 rounded-lg w-fit">
+                    <Zap className="w-6 h-6 text-purple-400" />
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-medium text-white mb-2">
+                  Lightning-Fast Responses
+                </h2>
+                <p className="text-sm text-gray-400">
+                  Caching and optimized paths keep your app blazing fast.
+                </p>
               </div>
 
-              {/* Icons */}
-              <div className="flex justify-center items-center space-x-6 z-10">
-                <div className="bg-[#2b2b40] p-3 rounded-full custom-get-started-button mt-6">
-                  <Image
-                    src="/icon.png"
-                    alt="Icon 1"
-                    className="w-8 h-8"
-                    width={20}
-                    height={20}
-                  />
-                </div>
-                <div className="bg-[#a855f7] custom-get-started-button p-4.5 rounded-full shadow-lg mb-32">
-                  <Image
-                    src="/icon.png"
-                    alt="Main Icon"
-                    className="w-12 h-12"
-                    width={40}
-                    height={40}
-                  />
-                </div>
-                <div className="bg-[#2b2b40] p-3 rounded-full custom-get-started-button mt-20">
-                  <Image
-                    src="/icon.png"
-                    alt="Icon 2"
-                    className="w-8 h-8"
-                    width={20}
-                    height={20}
-                  />
+              <div className="flex justify-center items-center z-10 flex-1 relative">
+                <div className="relative">
+                  <div className="flex justify-center items-center space-x-6">
+                    <div className="bg-[#2b2b40] p-3 rounded-full custom-get-started-button mt-6 relative">
+                      <Gauge className="w-6 h-6 text-purple-300" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
+                    </div>
+                    <div className="bg-[#a855f7] custom-get-started-button p-4 rounded-full shadow-lg mb-32 relative">
+                      <Network className="w-8 h-8 text-white" />
+                      <div className="absolute inset-0 rounded-full bg-purple-500 animate-ping opacity-20"></div>
+                    </div>
+                    <div className="bg-[#2b2b40] p-3 rounded-full custom-get-started-button mt-20 relative">
+                      <Gauge className="w-6 h-6 text-purple-300" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
+                    </div>
+                  </div>
+
+                  {/* Speed lines */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-full h-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/70 to-purple-500/0 animate-pulse"></div>
+                    <div className="w-full h-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/50 to-purple-500/0 animate-pulse absolute top-1/2 transform -translate-y-1/2 translate-y-2"></div>
+                    <div className="w-full h-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/30 to-purple-500/0 animate-pulse absolute top-1/2 transform -translate-y-1/2 -translate-y-2"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -371,73 +492,79 @@ export default function Home() {
                     "radial-gradient(ellipse at bottom, rgba(168, 85, 247, 0.4), transparent 60%)",
                 }}
               />
-              <Image
-                src="/round-logo.png"
-                alt="logo"
-                height={90}
-                width={90}
-                className="z-10"
-              />
 
-              <div className="absolute w-36 h-36 rounded-full border border-[#1a1a3a]/80 opacity-90 z-10" />
-              <div className="absolute w-56 h-56 rounded-full border border-[#1a1a3a]/70 opacity-90 z-10" />
-              <div className="absolute w-72 h-72 rounded-full border border-[#1a1a3a]/80 opacity-90 z-10" />
+              <div className="relative w-full h-full flex flex-col justify-center items-center">
+                <Image
+                  src="/round-logo.png"
+                  alt="logo"
+                  height={90}
+                  width={90}
+                  className="z-10"
+                />
 
-              {/* 🧿 Icons on Rings */}
-              <div className="absolute w-36 h-36 spin-slow z-10">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 border border-slate-800 rounded-full shadow-md shadow-">
-                  <div className="w-7 h-7 bg-[#1a1a3a] rounded-full flex items-center justify-center text-white text-sm shadow-md">
-                    <ImDatabase />
+                <div className="absolute w-36 h-36 rounded-full border border-[#1a1a3a]/80 opacity-90 z-10" />
+                <div className="absolute w-56 h-56 rounded-full border border-[#1a1a3a]/70 opacity-90 z-10" />
+                <div className="absolute w-72 h-72 rounded-full border border-[#1a1a3a]/80 opacity-90 z-10" />
+
+                <div className="absolute w-36 h-36 spin-slow z-10">
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 border border-slate-800 rounded-full shadow-md">
+                    <div className="w-7 h-7 bg-[#1a1a3a] rounded-full flex items-center justify-center text-white text-sm shadow-md">
+                      <ImDatabase />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="absolute w-56 h-56 spin-slower z-10">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 border border-slate-800 rounded-full">
-                  <div className="w-7 h-7 bg-[#1a1a3a] rounded-full flex items-center justify-center text-white text-sm shadow-md">
-                    <GrNodes />
+                <div className="absolute w-56 h-56 spin-slower z-10">
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 border border-slate-800 rounded-full">
+                    <div className="w-7 h-7 bg-[#1a1a3a] rounded-full flex items-center justify-center text-white text-sm shadow-md">
+                      <GrNodes />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="absolute w-72 h-72 spin-slowest z-10">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 border border-slate-800 rounded-full">
-                  <div className="w-7 h-7 bg-[#1a1a3a] rounded-full flex items-center justify-center text-white text-sm shadow-md">
-                    <SiSpeedypage />
+                <div className="absolute w-72 h-72 spin-slowest z-10">
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 border border-slate-800 rounded-full">
+                    <div className="w-7 h-7 bg-[#1a1a3a] rounded-full flex items-center justify-center text-white text-sm shadow-md">
+                      <SiSpeedypage />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 📝 Content Layer on Bottom Left */}
-              <div className="absolute bottom-4 left-4 z-20 text-white">
-                <h3 className="text-lg font-semibold">Something</h3>
-                <p className="text-sm text-gray-300">description</p>
+                {/* Pulse dots around the circles */}
+                <div className="absolute w-36 h-36 z-5">
+                  <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1/2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping"></div>
+                  </div>
+                </div>
+
+                <div className="absolute w-56 h-56 z-5">
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping"></div>
+                  </div>
+                </div>
+
+                <div className="absolute w-72 h-72 z-5">
+                  <div className="absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping"></div>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-4 left-4 z-20 text-white">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="bg-purple-500/20 p-1.5 rounded-lg">
+                      <BarChart3 className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <h3 className="text-lg font-medium">Full Visibility</h3>
+                  </div>
+                  <p className="text-sm text-gray-300">
+                    Monitor every request and error from a real-time dashboard.
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="bg-[#0a0a1f] relative rounded-xl overflow-hidden h-96 flex flex-col justify-center gap-2 px-6 border border-[#1a1a3a] md:col-span-2 w-full max-w-5xl ">
-              <style>
-                {`
-                @keyframes float {
-              0% {
-                transform: translateY(0px);
-                opacity: 0.5;
-              }
-              50% {
-                opacity: 0.8;
-              }
-              100% {
-                transform: translateY(-30vh);
-                opacity: 0;
-              }
-            }
-            .animate-float {
-              animation: float 15s linear infinite;
-            }
-             `}
-              </style>
-
-              {/* Radial glow on top */}
+            <div className="bg-[#0a0a1f] relative rounded-xl overflow-hidden h-96 flex flex-col justify-center gap-2 px-6 border border-[#1a1a3a] md:col-span-2 w-full max-w-5xl">
+              {/* Purple Glow */}
               <div
                 className="absolute -top-16 left-1/2 w-full h-28 transform -translate-x-1/2 z-0 blur-2xl pointer-events-none"
                 style={{
@@ -446,39 +573,38 @@ export default function Home() {
                 }}
               />
 
-              {/* Sparkles */}
-              <div className="absolute inset-0  z-10 pointer-events-none overflow-hidden">
-                {[...Array(30)].map((_, i) => {
-                  const left = Math.random() * 100;
-                  const delay = Math.random() * 3;
-                  const duration = 5 + Math.random() * 5;
-                  const size = 1 + Math.random() * 1;
-
-                  return (
-                    <div
-                      key={i}
-                      className="absolute rounded-full opacity-70"
-                      style={{
-                        left: `${left}%`,
-                        bottom: 0,
-                        width: `${size}px`,
-                        height: `${size}px`,
-                        animation: `float ${duration}s ease-in infinite`,
-                        animationDelay: `${delay}s`,
-                        background: "radial-gradient(circle, #ffffff, #a855f7)",
-                        boxShadow: "0 0 1px #c084fc",
-                      }}
-                    />
-                  );
-                })}
+              <div className="absolute top-4 right-6 z-10 text-right">
+                <div className="flex items-center justify-end gap-2 mb-1">
+                  <div className="bg-purple-500/20 p-1.5 rounded-lg">
+                    <Network className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <h2 className="text-lg font-medium text-white">
+                    RPC Management
+                  </h2>
+                </div>
+                <p className="text-sm text-gray-400">
+                  Manage all your endpoints from a single dashboard with
+                  real-time metrics.
+                </p>
               </div>
 
-              {/* Endpoint list */}
-              <div className="relative z-20 flex flex-col gap-2">
-                {endpoints.map((endpoint, index) => (
+              {/* Header for the table */}
+              <div className="relative z-20 mt-16 mb-2 px-2">
+                <div className="grid grid-cols-[1fr,auto,auto,auto,auto] gap-1 md:gap-6 text-xs text-gray-500">
+                  <div>ENDPOINT</div>
+                  <div className="w-20 md:w-24 text-center">STATUS</div>
+                  <div className="w-16 md:w-20 text-center">LATENCY</div>
+                  <div className="w-8 md:w-10 text-center">WEIGHT</div>
+                  <div className="w-8 text-center"></div>
+                </div>
+              </div>
+
+              {/* Endpoints List */}
+              <div className="relative z-20 flex flex-col gap-2 overflow-y-auto pr-1 endpoint-list">
+                {animatedEndpoints.map((endpoint, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between py-2 px-2 rounded-lg backdrop-blur-md bg-white/5 border border-white/10 shadow-lg"
+                    className="flex items-center justify-between py-2 px-2 rounded-lg backdrop-blur-md bg-white/5 border border-white/10 shadow-lg hover:bg-white/10 transition-colors duration-200"
                   >
                     <div className="flex-1 truncate text-white/80 font-mono text-sm">
                       {endpoint.url}
@@ -489,7 +615,7 @@ export default function Home() {
                           {endpoint.visibility}
                         </span>
                       </div>
-                      <div className="w-20 md:w-24 flex items-center">
+                      <div className="w-20 md:w-24 flex items-center justify-center">
                         <div
                           className={`h-2 w-2 rounded-full mr-2 ${
                             endpoint.status === "Online"
@@ -507,28 +633,14 @@ export default function Home() {
                           {endpoint.status === "Online" ? "Online" : ""}
                         </span>
                       </div>
-                      <div className="w-16 md:w-20 text-white/80 text-sm">
+                      <div className="w-16 md:w-20 text-white/80 text-sm text-center">
                         {endpoint.latency}
                       </div>
-                      <div className="w-8 md:w-10 text-white/80 text-sm">
+                      <div className="w-8 md:w-10 text-white/80 text-sm text-center">
                         {endpoint.weight}
                       </div>
                       <div className="w-8 h-8 flex items-center justify-center text-white/60">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <circle cx="12" cy="12" r="1" />
-                          <circle cx="19" cy="12" r="1" />
-                          <circle cx="5" cy="12" r="1" />
-                        </svg>
+                        <MoreHorizontal className="w-4 h-4" />
                       </div>
                     </div>
                   </div>
@@ -536,15 +648,101 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {/* Centered SOLRPC Text */}
-          <div className="flex justify-center items-center mt-64 z-30">
-            <div className="inter tracking-tighter text-[16rem] font-black bg-clip-text text-transparent bg-gradient-to-b from-slate-700 to-transparent text-center">
-              SOLRPC
-            </div>
-          </div>
+        </div>
 
-          <style jsx>{`
-            @keyframes float {
+        {/* Add CSS for animations */}
+        <style jsx>{`
+          .spin-slow {
+            animation: spin 20s linear infinite;
+          }
+          .spin-slower {
+            animation: spin 30s linear infinite;
+          }
+          .spin-slowest {
+            animation: spin 40s linear infinite;
+          }
+          @keyframes spin {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
+          }
+          .endpoint-list::-webkit-scrollbar {
+            width: 4px;
+          }
+          .endpoint-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+          }
+          .endpoint-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+          }
+          .endpoint-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+          }
+        `}</style>
+      </section>
+
+      <section className="relative bg-[#050816] z-0 overflow-hidden h-[104vh]">
+        <div className="flex flex-col justify-center items-center pt-44">
+          {/* Random Stars Animation */}
+          <div className="absolute inset-0 pointer-events-none">
+            {stars.map((star) => (
+              <div
+                key={star.id}
+                className="absolute bg-white rounded-full opacity-70 animate-float"
+                style={{
+                  left: `${star.left}%`,
+                  bottom: "-20px",
+                  width: `${star.size}px`,
+                  height: `${star.size}px`,
+                  animationDelay: `${star.delay}s`,
+                }}
+              />
+            ))}
+          </div>
+          <Image
+            src="/icon.png"
+            alt="icon"
+            height={80}
+            width={80}
+            className="mb-2"
+          />
+          <div className="text-4xl inter tracking-tight mb-2">
+            Building a high-performance Solana app?
+          </div>
+          <span className="text-xl instrument-serif-regular-italic text-slate-200/80">
+            Let’s help you scale with reliable, low-latency RPCs, failover, and
+            full WebSocket support.
+          </span>
+          <form className="relative w-full max-w-sm mx-auto mt-8">
+            <input
+              type="email"
+              placeholder="example@gmail.com"
+              className="w-full px-4 py-3 pr-32 rounded-full text-sm bg-[#0f0f0f] border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            <button
+              type="submit"
+              className="absolute top-1 right-1 h-[calc(100%-0.5rem)] px-10 text-sm font-medium text-white bg-purple-500 hover:bg-purple-600 rounded-full transition-colors"
+            >
+              Join
+            </button>
+          </form>
+        </div>
+
+        {/* Centered SOLRPC Text */}
+        <div className="flex justify-center items-center mt-24 z-30 ">
+          <div className="inter tracking-tighter text-[16rem] font-black bg-clip-text text-transparent bg-gradient-to-b from-slate-700 to-transparent text-center">
+            SOLRPC
+          </div>
+        </div>
+
+        <style>
+          {`
+                @keyframes float {
               0% {
                 transform: translateY(0px);
                 opacity: 0.5;
@@ -558,13 +756,13 @@ export default function Home() {
               }
             }
             .animate-float {
-              animation: float 12s linear infinite;
+              animation: float 15s linear infinite;
             }
-          `}</style>
-        </div>
+             `}
+        </style>
       </section>
 
-      <section className="relative h-[40vh] bg-[#050816] z-0 overflow-hidden"></section>
+      <section className="relative h-[30vh] bg-[#050816] z-0 overflow-hidden"></section>
     </div>
   );
 }
