@@ -74,11 +74,11 @@ type LoadBalancingMethods =
 
 export type WeightedEndpoint = { url: string; weight: number };
 
-type SimpleEndpoint = string;
+export type SimpleEndpoint = string;
 
-type WeightedEndpointRecord = Record<NetworkOptions, WeightedEndpoint[]>;
+export type WeightedEndpointRecord = Record<NetworkOptions, WeightedEndpoint[]>;
 
-type SimpleEndpointRecord = Record<NetworkOptions, SimpleEndpoint[]>;
+export type SimpleEndpointRecord = Record<NetworkOptions, SimpleEndpoint[]>;
 
 export type HttpConfig =
   | {

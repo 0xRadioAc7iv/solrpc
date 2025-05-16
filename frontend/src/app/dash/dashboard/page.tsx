@@ -8,6 +8,7 @@ import { StatusOverview } from "@/components/status-overview";
 import { RequestMetrics } from "@/components/request-metrics";
 import SearchBar from "@/components/SearchBar";
 import { useStatsStore } from "@/lib/store";
+import { Endpoint } from "@/types/dashboard";
 
 export default function Home() {
   const {
@@ -136,7 +137,7 @@ export default function Home() {
         </TabsContent>
 
         <TabsContent value="endpoints" className="space-y-4">
-          {/* <EndpointList endpoints={endpoints} /> */}
+          <EndpointList />
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-4">

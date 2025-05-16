@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,15 +11,6 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogTrigger,
@@ -30,117 +21,82 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import { Endpoint, NetworkType } from "@/types/dashboard";
+import { useStatsStore } from "@/lib/store";
 import {
-  Endpoint,
-  EndpointType,
-  NetworkType,
-  StatusType,
-} from "@/types/dashboard";
-import { v4 as uuidv4 } from "uuid";
-
-interface EndpointListProps {
-  endpoints: Endpoint[];
-}
+  ConfigOptions,
+  SimpleEndpoint,
+  SimpleEndpointRecord,
+  WeightedEndpoint,
+  WeightedEndpointRecord,
+} from "@/types/store";
 
 type EndpointFormState = Omit<Endpoint, "id">;
 
 const stringFields: (keyof Pick<EndpointFormState, "url">)[] = ["url"];
 
-export function EndpointList({ endpoints }: EndpointListProps) {
-  const [localEndpoints, setLocalEndpoints] = useState<Endpoint[]>(endpoints);
+export function EndpointList() {
+  const { config, endpointsData, updateConfig } = useStatsStore();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const [formState, setFormState] = useState<EndpointFormState>({
+  const [formState, setFormState] = useState<{
+    url: string;
+    network: "devnet" | "mainnet";
+    weight: number;
+  }>({
     url: "",
-    type: EndpointType.RPC,
-    network: NetworkType.MAINNET,
-    status: StatusType.ONLINE,
-    latency: 0,
-    weight: 1,
-    enabled: true,
+    network: "devnet",
+    weight: 0,
   });
-
-  useEffect(() => {
-    setLocalEndpoints(endpoints);
-  }, [endpoints]);
-
-  const toggleEndpoint = (id: string) => {
-    setLocalEndpoints((prev) =>
-      prev.map((endpoint) =>
-        endpoint.id === id
-          ? { ...endpoint, enabled: !endpoint.enabled }
-          : endpoint
-      )
-    );
-  };
 
   const openAddDialog = () => {
     setEditingId(null);
     setFormState({
       url: "",
-      type: EndpointType.RPC,
-      network: NetworkType.MAINNET,
-      status: StatusType.ONLINE,
-      latency: 0,
-      weight: 1,
-      enabled: true,
+      network: "devnet",
+      weight: 0,
     });
     setIsDialogOpen(true);
   };
 
-  const openEditDialog = (endpoint: Endpoint) => {
-    setEditingId(endpoint.id);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, ...rest } = endpoint;
-    setFormState({ ...rest });
-    setIsDialogOpen(true);
-  };
+  const handleSave = async () => {
+    if (config) {
+      const isDevnet = config.network === "devnet";
+      const isWeighted = config.balancingOptions.http.method === "weighted";
 
-  const handleSave = () => {
-    if (editingId) {
-      setLocalEndpoints((prev) =>
-        prev.map((endpoint) =>
-          endpoint.id === editingId
-            ? { ...endpoint, ...formState, id: editingId }
-            : endpoint
-        )
-      );
-    } else {
-      const newEndpoint: Endpoint = {
-        id: uuidv4(),
-        ...formState,
+      const newBalancingOptions = structuredClone(config.balancingOptions);
+
+      if (isWeighted) {
+        const endpoints = newBalancingOptions.http
+          .endpoints as WeightedEndpointRecord;
+        const newEndpoint: WeightedEndpoint = {
+          url: formState.url,
+          weight: formState.weight,
+        };
+        isDevnet
+          ? endpoints.devnet.push(newEndpoint)
+          : endpoints.mainnet.push(newEndpoint);
+      } else {
+        const endpoints = newBalancingOptions.http
+          .endpoints as SimpleEndpointRecord;
+        const newEndpoint: SimpleEndpoint = formState.url as string;
+        isDevnet
+          ? endpoints.devnet.push(newEndpoint)
+          : endpoints.mainnet.push(newEndpoint);
+      }
+
+      const newConfig: ConfigOptions = {
+        network: config.network,
+        balancingOptions: newBalancingOptions,
+        cachingMethod: config.cachingMethod,
+        maxRetries: config.maxRetries,
       };
-      setLocalEndpoints((prev) => [...prev, newEndpoint]);
-    }
-    setIsDialogOpen(false);
-    setEditingId(null);
-  };
 
-  const handleDelete = (id: string) => {
-    setLocalEndpoints((prev) => prev.filter((ep) => ep.id !== id));
-  };
-
-  const handleTestConnection = async (id: string) => {
-    const endpoint = localEndpoints.find((ep) => ep.id === id);
-    if (!endpoint) return;
-
-    const start = performance.now();
-    try {
-      await fetch(endpoint.url, { method: "HEAD", mode: "no-cors" });
-      const latency = Math.round(performance.now() - start);
-      setLocalEndpoints((prev) =>
-        prev.map((ep) =>
-          ep.id === id ? { ...ep, status: StatusType.ONLINE, latency } : ep
-        )
-      );
-    } catch {
-      setLocalEndpoints((prev) =>
-        prev.map((ep) =>
-          ep.id === id ? { ...ep, status: StatusType.OFFLINE, latency: 0 } : ep
-        )
-      );
+      await updateConfig(newConfig);
+      setIsDialogOpen(false);
     }
   };
 
@@ -166,35 +122,18 @@ export function EndpointList({ endpoints }: EndpointListProps) {
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {stringFields.map((key) => (
-                <div key={key} className="flex flex-col gap-2 font-light">
-                  <Label>{key.charAt(0).toUpperCase() + key.slice(1)}</Label>
-                  <Input
-                    value={formState[key]}
-                    onChange={(e) =>
-                      setFormState({ ...formState, [key]: e.target.value })
-                    }
-                  />
-                </div>
-              ))}
               <div className="flex flex-col gap-2 font-light">
-                <Label>Type</Label>
-                <select
+                <Label>URL</Label>
+                <input
                   className="flex h-10 w-full rounded-md border border-slate-700 bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={formState.type}
+                  value={formState.url}
                   onChange={(e) =>
                     setFormState({
                       ...formState,
-                      type: e.target.value as EndpointType,
+                      url: e.target.value,
                     })
                   }
-                >
-                  {Object.values(EndpointType).map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
+                ></input>
               </div>
               <div className="flex flex-col gap-2 font-light">
                 <Label>Network</Label>
@@ -215,51 +154,21 @@ export function EndpointList({ endpoints }: EndpointListProps) {
                   ))}
                 </select>
               </div>
-              <div className="flex flex-col gap-2 font-light">
-                <Label>Status</Label>
-                <select
-                  className="flex h-10 w-full rounded-md border border-slate-700 bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={formState.status}
-                  onChange={(e) =>
-                    setFormState({
-                      ...formState,
-                      status: e.target.value as StatusType,
-                    })
-                  }
-                >
-                  {Object.values(StatusType).map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-2 font-light">
-                <Label>Latency (ms)</Label>
-                <Input
-                  type="number"
-                  value={formState.latency}
-                  onChange={(e) =>
-                    setFormState({
-                      ...formState,
-                      latency: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div className="flex flex-col gap-2 font-light">
-                <Label>Weight</Label>
-                <Input
-                  type="number"
-                  value={formState.weight}
-                  onChange={(e) =>
-                    setFormState({
-                      ...formState,
-                      weight: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
+              {config?.balancingOptions.http.method === "weighted" && (
+                <div className="flex flex-col gap-2 font-light">
+                  <Label>Weight</Label>
+                  <Input
+                    type="number"
+                    value={formState.weight}
+                    onChange={(e) =>
+                      setFormState({
+                        ...formState,
+                        weight: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button
@@ -278,84 +187,38 @@ export function EndpointList({ endpoints }: EndpointListProps) {
           <TableHeader>
             <TableRow>
               <TableHead className="text-white">URL</TableHead>
-              <TableHead className="text-white">Type</TableHead>
               <TableHead className="text-white">Network</TableHead>
               <TableHead className="text-white">Status</TableHead>
               <TableHead className="text-white">Latency</TableHead>
               <TableHead className="text-white">Weight</TableHead>
-              <TableHead className="text-white">Enabled</TableHead>
-              <TableHead className="w-[50px] text-white"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {localEndpoints.map((endpoint) => (
-              <TableRow key={endpoint.id}>
-                <TableCell className="font-mono text-xs">
-                  {endpoint.url}
+            {endpointsData.map((endpoint) => (
+              <TableRow key={endpoint.key}>
+                <TableCell className="font-mono text-sm">
+                  {endpoint.key}
                 </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="text-white">
-                    {endpoint.type}
-                  </Badge>
-                </TableCell>
-                <TableCell>{endpoint.network}</TableCell>
+                <TableCell>{endpoint.value.network}</TableCell>
                 <TableCell>
                   <Badge
                     className={`
-                      ${endpoint.status === StatusType.ONLINE ? "active" : ""}
-                      ${
-                        endpoint.status === StatusType.DEGRADED
-                          ? "memcached"
-                          : ""
-                      }
+                      ${endpoint.value.isActive ? "active" : ""}
+                      ${!endpoint.value.isActive ? "memcached" : ""}
                     `}
                   >
-                    {endpoint.status}
+                    {endpoint.value.isActive ? "Enabled" : "Disabled"}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  {endpoint.status === StatusType.OFFLINE
-                    ? "-"
-                    : `${endpoint.latency}ms`}
-                </TableCell>
-                <TableCell>{endpoint.weight}</TableCell>
-                <TableCell>
-                  <Switch
-                    checked={endpoint.enabled}
-                    onCheckedChange={() => toggleEndpoint(endpoint.id)}
-                  />
+                  {endpoint.value.isActive
+                    ? `${endpoint.value.latency} ms`
+                    : "-"}
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => openEditDialog(endpoint)}
-                      >
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleTestConnection(endpoint.id)}
-                      >
-                        Test Connection
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>View Logs</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(endpoint.id)}
-                        className="text-destructive"
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {(endpoint.value.weight as number) > 0
+                    ? endpoint.value.weight
+                    : "-"}
                 </TableCell>
               </TableRow>
             ))}

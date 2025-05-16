@@ -3,10 +3,10 @@ import { ConfigOptions } from "../../types";
 import { config, engine, server } from "../..";
 
 export const apiRouteGroup: FastifyPluginCallback = (fastify) => {
-  fastify.post<{ Body: ConfigOptions }>("/config", async (request, reply) => {
+  fastify.post("/config", async (request, reply) => {
     const newConfig = request.body;
 
-    config.updateConfig(newConfig);
+    config.updateConfig(JSON.parse(newConfig as string) as ConfigOptions);
     server.restart(config.getConfig());
 
     reply.code(200).send({

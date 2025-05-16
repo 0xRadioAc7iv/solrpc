@@ -31,7 +31,7 @@ abstract class BaseBalancer implements Balancer {
   protected healthCheckInterval: number;
   protected healthyTargets: Set<string> = new Set();
 
-  constructor(targets: string[], intervalMs = 5000) {
+  constructor(targets: string[], intervalMs = 10000) {
     this.targets = targets;
     this.healthCheckInterval = intervalMs;
     this.startHealthCheck();
