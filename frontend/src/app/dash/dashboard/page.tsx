@@ -6,9 +6,7 @@ import { CheckCircle2, Clock, Database, Shield } from "lucide-react";
 import { EndpointList } from "@/components/endpoint-list";
 import { StatusOverview } from "@/components/status-overview";
 import { RequestMetrics } from "@/components/request-metrics";
-import SearchBar from "@/components/SearchBar";
 import { useStatsStore } from "@/lib/store";
-import { Endpoint } from "@/types/dashboard";
 
 export default function Home() {
   const {
@@ -20,8 +18,7 @@ export default function Home() {
   } = useStatsStore();
 
   return (
-    <div className="border border-black text-white pt-16 bg-[#050816] px-6">
-      <SearchBar />
+    <div className="border border-black text-white pt-4 bg-[#050816] px-6">
       <div>
         <h1 className="text-2xl font-normal tracking-tight inter mt-3 ">
           Dashboard

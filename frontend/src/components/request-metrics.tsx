@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { useStatsStore } from "@/lib/store";
 import { format } from "date-fns";
+import { useEffect } from "react";
 
 const requestData = [
   { time: "00:00", requests: 120, errors: 2, latency: 145 },
@@ -72,11 +73,11 @@ export function RequestMetrics() {
     return acc;
   }, {} as Record<string, number>);
 
-  const requestChartData = Object.entries(
-    requestsPerHour as Record<string, number>
-  )
-    .map(([time, count]) => ({ time, requests: count }))
-    .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+  const requestChartData =
+    requestsPerHour &&
+    Object.entries(requestsPerHour as Record<string, number>)
+      .map(([time, count]) => ({ time, requests: count }))
+      .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
 
   const latencyDataPerMinute = responseLatencies.reduce(
     (acc, { timestamp, latency }) => {
@@ -94,12 +95,14 @@ export function RequestMetrics() {
     {} as Record<string, { totalLatency: number; count: number }>
   );
 
-  const responseChartData = Object.entries(latencyDataPerMinute)
-    .map(([time, { totalLatency, count }]) => ({
-      time,
-      latency: parseFloat((totalLatency / count).toFixed(2)), // average latency
-    }))
-    .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+  const responseChartData =
+    latencyDataPerMinute &&
+    Object.entries(latencyDataPerMinute)
+      .map(([time, { totalLatency, count }]) => ({
+        time,
+        latency: parseFloat((totalLatency / count).toFixed(2)), // average latency
+      }))
+      .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
 
   return (
     <div className="space-y-4 text-white bg-[#050816]">
