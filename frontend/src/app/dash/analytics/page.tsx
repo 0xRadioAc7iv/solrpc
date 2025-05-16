@@ -33,13 +33,46 @@ import {
   Download,
   FileText,
   Filter,
-  LineChart,
   RefreshCw,
   Search,
   Trash2,
 } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { useStatsStore } from "@/lib/store";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  BarChart,
+  Bar,
+  ResponsiveContainer,
+} from "recharts";
+
+const requestVolumeData = [
+  { date: "Mon", requests: 120 },
+  { date: "Tue", requests: 200 },
+  { date: "Wed", requests: 150 },
+  { date: "Thu", requests: 300 },
+  { date: "Fri", requests: 280 },
+  { date: "Sat", requests: 180 },
+  { date: "Sun", requests: 220 },
+];
+
+const rpcMethodsData = [
+  { method: "getBalance", count: 400 },
+  { method: "getTransaction", count: 300 },
+  { method: "getAccountInfo", count: 200 },
+  { method: "getSlot", count: 150 },
+];
+
+const endpointPerformanceData = [
+  { endpoint: "RPC 1", latency: 45 },
+  { endpoint: "RPC 2", latency: 70 },
+  { endpoint: "RPC 3", latency: 32 },
+];
 
 export default function Analytics() {
   const { requestData, requestErrorRate, responseLatencies, logs } =
@@ -153,11 +186,31 @@ export default function Analytics() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="requests">Requests</TabsTrigger>
-          <TabsTrigger value="errors">Errors</TabsTrigger>
-          <TabsTrigger value="logs">Logs</TabsTrigger>
+        <TabsList className="bg-[#202020]">
+          <TabsTrigger
+            value="overview"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="requests"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white"
+          >
+            Requests
+          </TabsTrigger>
+          <TabsTrigger
+            value="errors"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white"
+          >
+            Errors
+          </TabsTrigger>
+          <TabsTrigger
+            value="logs"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white"
+          >
+            Logs
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -169,10 +222,55 @@ export default function Analytics() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] rounded-md border p-4 flex items-center justify-center">
-                <p className="text-muted-foreground">
-                  Request volume chart will appear here
-                </p>
+              <div className="h-[300px] rounded-md border border-slate-800 p-4 bg-[#1d0e2e7c]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={requestVolumeData}
+                    margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                  >
+                    <defs>
+                      <linearGradient
+                        id="colorRequests"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="#8b5cf6"
+                          stopOpacity={0.8}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#8b5cf6"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
+                    <XAxis dataKey="date" stroke="#a3a3c2" />
+                    <YAxis stroke="#a3a3c2" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1f1f3a",
+                        borderColor: "#8b5cf6",
+                        color: "#fff",
+                      }}
+                      labelStyle={{ color: "#c7d2fe" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="requests"
+                      stroke="#8b5cf6"
+                      strokeWidth={2.5}
+                      dot={{ stroke: "#1f1f3a", strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6 }}
+                      fillOpacity={1}
+                      fill="url(#colorRequests)"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
@@ -186,10 +284,50 @@ export default function Analytics() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px] rounded-md border p-4 flex items-center justify-center">
-                  <p className="text-muted-foreground">
-                    RPC methods chart will appear here
-                  </p>
+                <div className="h-[300px] rounded-md border border-slate-800 p-4 bg-[#1d0e2e7c]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={rpcMethodsData}
+                      margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                    >
+                      <defs>
+                        <linearGradient
+                          id="colorRPC"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#a855f7"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#a855f7"
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
+                      <XAxis dataKey="method" stroke="#a3a3c2" />
+                      <YAxis stroke="#a3a3c2" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#1f1f3a",
+                          borderColor: "#a855f7",
+                          color: "#fff",
+                        }}
+                        labelStyle={{ color: "#e9d5ff" }}
+                      />
+                      <Bar
+                        dataKey="count"
+                        fill="url(#colorRPC)"
+                        radius={[6, 6, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
@@ -202,10 +340,56 @@ export default function Analytics() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px] rounded-md border p-4 flex items-center justify-center">
-                  <p className="text-muted-foreground">
-                    Endpoint performance chart will appear here
-                  </p>
+                <div className="h-[300px] rounded-md border border-slate-800 bg-[#1d0e2e7c]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={endpointPerformanceData}
+                      layout="vertical"
+                      margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+                    >
+                      <defs>
+                        <linearGradient
+                          id="colorLatency"
+                          x1="0"
+                          y1="0"
+                          x2="1"
+                          y2="0"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#a855f7"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#a855f7"
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
+                      <XAxis type="number" stroke="#a3a3c2" />
+                      <YAxis
+                        dataKey="endpoint"
+                        type="category"
+                        stroke="#a3a3c2"
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#1f1f3a",
+                          borderColor: "#a855f7",
+                          color: "#fff",
+                        }}
+                        labelStyle={{ color: "#e9d5ff" }}
+                      />
+                      <Bar
+                        dataKey="latency"
+                        fill="url(#colorLatency)"
+                        barSize={50}
+                        radius={[0, 6, 6, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
@@ -423,7 +607,7 @@ export default function Analytics() {
               <div className="h-[400px] rounded-md bg-black p-4 font-mono text-xs text-green-400 overflow-auto">
                 {logs.map((log, index) => {
                   return (
-                    <div id={index.toString()}>
+                    <div key={index} id={index.toString()}>
                       <div>
                         [{new Date(log.timestamp).toISOString().toString()}] [
                         {log.type}]{" "}
