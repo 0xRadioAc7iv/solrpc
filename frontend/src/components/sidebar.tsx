@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { BarChart3, Database, Layers, Network, Settings, Cpu, Menu } from "lucide-react"
+import { BarChart3, Database,  Network, Settings, Cpu, Menu } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -45,11 +45,6 @@ export function Sidebar() {
       icon: <Cpu className="h-5 w-5" />,
     },
     {
-      title: "Load Balancing",
-      href: "/dash/load",
-      icon: <Layers className="h-5 w-5" />,
-    },
-    {
       title: "Networks",
       href: "/dash/networks",
       icon: <Network className="h-5 w-5" />,
@@ -85,7 +80,7 @@ export function Sidebar() {
                 href={item.href}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-purple-900/70",
-                  pathname === item.href ? "bg-purple-900 text-white" : "text-slate-300",
+                  pathname === item.href ? "custom-get-started-button text-white" : "text-slate-300",
                 )}
               >
                 {item.icon}
@@ -98,7 +93,6 @@ export function Sidebar() {
     </div>
   )
 
-  // Mobile sidebar using Sheet component
   if (isMobile) {
     return (
       <Sheet>

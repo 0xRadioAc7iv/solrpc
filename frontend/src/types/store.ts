@@ -137,7 +137,7 @@ type LogEntryErrorRpcUnhandled = {
   type: "rpc-unhandled";
   requestId: number;
   method: string;
-  err: any;
+  err: unknown;
 };
 
 type LogEntryError = {

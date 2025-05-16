@@ -98,11 +98,31 @@ export default function Endpoints() {
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="all">All Endpoints</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="inactive">Inactive</TabsTrigger>
-          <TabsTrigger value="degraded">Degraded</TabsTrigger>
+        <TabsList className="bg-[#202020]">
+          <TabsTrigger
+            value="all"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white"
+          >
+            All Endpoints
+          </TabsTrigger>
+          <TabsTrigger
+            value="active"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white"
+          >
+            Active
+          </TabsTrigger>
+          <TabsTrigger
+            value="inactive"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white"
+          >
+            Inactive
+          </TabsTrigger>
+          <TabsTrigger
+            value="degraded"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white"
+          >
+            Degraded
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
@@ -262,7 +282,9 @@ export default function Endpoints() {
                     <TableHead className="text-white">Status</TableHead>
                     <TableHead className="text-white">Latency</TableHead>
                     <TableHead className="text-white">Last Check</TableHead>
-                    <TableHead className="text-right text-white">Actions</TableHead>
+                    <TableHead className="text-right text-white">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -346,7 +368,9 @@ export default function Endpoints() {
                     <TableHead className="text-white">URL</TableHead>
                     <TableHead className="text-white">Status</TableHead>
                     <TableHead className="text-white">Last Check</TableHead>
-                    <TableHead className="text-right text-white">Actions</TableHead>
+                    <TableHead className="text-right text-white">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -402,7 +426,9 @@ export default function Endpoints() {
                     <TableHead className="text-white">Status</TableHead>
                     <TableHead className="text-white">Latency</TableHead>
                     <TableHead className="text-white">Last Check</TableHead>
-                    <TableHead className="text-right text-white">Actions</TableHead>
+                    <TableHead className="text-right text-white">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

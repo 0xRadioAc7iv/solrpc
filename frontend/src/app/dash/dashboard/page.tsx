@@ -35,15 +35,24 @@ export default function Home() {
         ]);
 
         const transformedEndpoints: Endpoint[] = endpointsRes.data.map(
-          (ep: { url: string; status?: string; latency?: number; weight?: number; active?: boolean }, idx: number) => ({
+          (
+            ep: {
+              url: string;
+              status?: string;
+              latency?: number;
+              weight?: number;
+              active?: boolean;
+            },
+            idx: number
+          ) => ({
             id: `${idx}`,
             url: ep.url,
-            type: "Public", 
-            network: "Mainnet-Beta", 
-            status: ep.status || "Online", 
+            type: "Public",
+            network: "Mainnet-Beta",
+            status: ep.status || "Online",
             latency: ep.latency || 0,
             weight: ep.weight || 1,
-            enabled: ep.active ?? true, 
+            enabled: ep.active ?? true,
           })
         );
 
@@ -152,11 +161,26 @@ export default function Home() {
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="mt-8">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="endpoints">Endpoints</TabsTrigger>
-          <TabsTrigger value="metrics">Metrics</TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-4 text-white">
+        <TabsList className="mt-8 bg-[#202020] ">
+          <TabsTrigger
+            value="overview"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white cursor-pointer"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="endpoints"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white cursor-pointer"
+          >
+            Endpoints
+          </TabsTrigger>
+          <TabsTrigger
+            value="metrics"
+            className="text-white data-[state=active]:text-black data-[state=active]:bg-white cursor-pointer"
+          >
+            Metrics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
