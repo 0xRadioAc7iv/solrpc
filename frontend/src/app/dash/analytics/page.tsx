@@ -37,7 +37,6 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import SearchBar from "@/components/SearchBar";
 import { useStatsStore } from "@/lib/store";
 import {
   LineChart,

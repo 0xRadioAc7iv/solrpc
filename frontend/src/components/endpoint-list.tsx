@@ -65,6 +65,8 @@ export function EndpointList() {
 
       const newBalancingOptions = structuredClone(config.balancingOptions);
 
+      const networkKey = isDevnet ? "devnet" : "mainnet";
+
       if (isWeighted) {
         const endpoints = newBalancingOptions.http
           .endpoints as WeightedEndpointRecord;
@@ -72,16 +74,12 @@ export function EndpointList() {
           url: formState.url,
           weight: formState.weight,
         };
-        isDevnet
-          ? endpoints.devnet.push(newEndpoint)
-          : endpoints.mainnet.push(newEndpoint);
+        endpoints[networkKey].push(newEndpoint);
       } else {
         const endpoints = newBalancingOptions.http
           .endpoints as SimpleEndpointRecord;
-        const newEndpoint: SimpleEndpoint = formState.url as string;
-        isDevnet
-          ? endpoints.devnet.push(newEndpoint)
-          : endpoints.mainnet.push(newEndpoint);
+        const newEndpoint: SimpleEndpoint = formState.url;
+        endpoints[networkKey].push(newEndpoint);
       }
 
       const newConfig: ConfigOptions = {

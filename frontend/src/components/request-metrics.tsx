@@ -35,34 +35,6 @@ import {
 } from "@/components/ui/select";
 import { useStatsStore } from "@/lib/store";
 import { format } from "date-fns";
-import { useEffect } from "react";
-
-const requestData = [
-  { time: "00:00", requests: 120, errors: 2, latency: 145 },
-  { time: "01:00", requests: 90, errors: 1, latency: 138 },
-  { time: "02:00", requests: 70, errors: 0, latency: 132 },
-  { time: "03:00", requests: 60, errors: 0, latency: 128 },
-  { time: "04:00", requests: 80, errors: 1, latency: 135 },
-  { time: "05:00", requests: 110, errors: 2, latency: 142 },
-  { time: "06:00", requests: 150, errors: 3, latency: 148 },
-  { time: "07:00", requests: 180, errors: 2, latency: 152 },
-  { time: "08:00", requests: 220, errors: 4, latency: 158 },
-  { time: "09:00", requests: 270, errors: 5, latency: 165 },
-  { time: "10:00", requests: 310, errors: 6, latency: 172 },
-  { time: "11:00", requests: 290, errors: 5, latency: 168 },
-  { time: "12:00", requests: 310, errors: 4, latency: 170 },
-  { time: "13:00", requests: 350, errors: 7, latency: 175 },
-  { time: "14:00", requests: 380, errors: 8, latency: 180 },
-  { time: "15:00", requests: 360, errors: 6, latency: 176 },
-  { time: "16:00", requests: 340, errors: 5, latency: 172 },
-  { time: "17:00", requests: 320, errors: 4, latency: 168 },
-  { time: "18:00", requests: 300, errors: 3, latency: 165 },
-  { time: "19:00", requests: 280, errors: 3, latency: 160 },
-  { time: "20:00", requests: 250, errors: 2, latency: 155 },
-  { time: "21:00", requests: 210, errors: 2, latency: 150 },
-  { time: "22:00", requests: 180, errors: 1, latency: 145 },
-  { time: "23:00", requests: 140, errors: 1, latency: 140 },
-];
 
 export function RequestMetrics() {
   const { topRpcMethods, requestData, responseLatencies } = useStatsStore();

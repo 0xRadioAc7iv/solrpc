@@ -21,7 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Coins, Save, Server, SettingsIcon } from "lucide-react";
+import { AlertCircle, Save, Server, SettingsIcon } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -31,6 +31,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import {
+  BalancingOptions,
   CachingMethods,
   ConfigOptions,
   HttpConfig,
@@ -52,9 +53,9 @@ export default function SettingsPage() {
   const { config, updateConfig } = useStatsStore();
 
   const [formState, setFormState] = useState<ConfigOptions>({
-    network: config?.network!,
-    balancingOptions: config?.balancingOptions!,
-    cachingMethod: config?.cachingMethod!,
+    network: config?.network as NetworkOptions,
+    balancingOptions: config?.balancingOptions as BalancingOptions,
+    cachingMethod: config?.cachingMethod as CachingMethods,
   });
 
   const handleUpdateNetwork = async () => {
@@ -201,7 +202,10 @@ export default function SettingsPage() {
                   </Select>
                 </div>
               </div>
-              <Button className="custom-get-started-button">
+              <Button
+                className="custom-get-started-button"
+                onClick={handleUpdateNetwork}
+              >
                 <Save className="mr-2 h-4 w-4" />
                 Save Settings
               </Button>
@@ -238,7 +242,10 @@ export default function SettingsPage() {
                 </Select>
               </div>
 
-              <Button className="custom-get-started-button">
+              <Button
+                className="custom-get-started-button"
+                onClick={handleUpdateCacheMethod}
+              >
                 <Save className="mr-2 h-4 w-4" />
                 Save Cache Settings
               </Button>
@@ -425,7 +432,14 @@ export default function SettingsPage() {
                     </p>
                   </div>
 
-                  <Button className="w-full custom-get-started-button h-10">
+                  <Button
+                    className="w-full custom-get-started-button h-10"
+                    onClick={() =>
+                      handleUpdateLoadBalancingMethod(
+                        formState.balancingOptions.http.method
+                      )
+                    }
+                  >
                     <Save className="mr-2 h-4 w-4" />
                     Save Configuration
                   </Button>

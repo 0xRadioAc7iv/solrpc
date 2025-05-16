@@ -22,7 +22,7 @@ export default function DashboardLayout({
     fetchAll();
 
     return () => clearInterval(interval);
-  }, [serverURL]);
+  }, [serverURL, fetchAll]);
 
   if (serverURL !== "") {
     return (
