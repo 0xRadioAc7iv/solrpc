@@ -28,15 +28,6 @@ export function StatusOverview() {
         <h2 className="text-lg font-normal text-slate-300 inter">
           System Status
         </h2>
-        <Select defaultValue="mainnet">
-          <SelectTrigger className="w-[180px] custom-get-started-button">
-            <SelectValue placeholder="Select network" />
-          </SelectTrigger>
-          <SelectContent className="custom-get-started-button">
-            <SelectItem value="mainnet">Mainnet-Beta</SelectItem>
-            <SelectItem value="devnet">Devnet</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
