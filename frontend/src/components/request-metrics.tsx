@@ -33,6 +33,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useStatsStore } from "@/lib/store";
+import { format } from "date-fns";
 
 const requestData = [
   { time: "00:00", requests: 120, errors: 2, latency: 145 },
@@ -61,15 +63,44 @@ const requestData = [
   { time: "23:00", requests: 140, errors: 1, latency: 140 },
 ];
 
-const methodData = [
-  { name: "getAccountInfo", count: 3240 },
-  { name: "getBalance", count: 2180 },
-  { name: "getBlockHeight", count: 1520 },
-  { name: "getTransaction", count: 980 },
-  { name: "getRecentBlockhash", count: 760 },
-];
-
 export function RequestMetrics() {
+  const { topRpcMethods, requestData, responseLatencies } = useStatsStore();
+
+  const requestsPerHour = requestData?.requests.reduce((acc, { timestamp }) => {
+    const hour = format(new Date(timestamp), "yyyy-MM-dd HH:00");
+    acc[hour] = (acc[hour] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const requestChartData = Object.entries(
+    requestsPerHour as Record<string, number>
+  )
+    .map(([time, count]) => ({ time, requests: count }))
+    .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+
+  const latencyDataPerMinute = responseLatencies.reduce(
+    (acc, { timestamp, latency }) => {
+      const bucket = format(new Date(timestamp), "yyyy-MM-dd HH:mm");
+
+      if (!acc[bucket]) {
+        acc[bucket] = { totalLatency: 0, count: 0 };
+      }
+
+      acc[bucket].totalLatency += latency;
+      acc[bucket].count += 1;
+
+      return acc;
+    },
+    {} as Record<string, { totalLatency: number; count: number }>
+  );
+
+  const responseChartData = Object.entries(latencyDataPerMinute)
+    .map(([time, { totalLatency, count }]) => ({
+      time,
+      latency: parseFloat((totalLatency / count).toFixed(2)), // average latency
+    }))
+    .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+
   return (
     <div className="space-y-4 text-white bg-[#050816]">
       <div className="flex items-center justify-between">
@@ -100,7 +131,7 @@ export function RequestMetrics() {
               config={{ requests: { color: "#431e6b", label: "Requests" } }}
             >
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={requestData}>
+                <AreaChart data={requestChartData}>
                   <XAxis
                     dataKey="time"
                     stroke="#888888"
@@ -141,7 +172,7 @@ export function RequestMetrics() {
               config={{ latency: { color: "#431e6b", label: "Latency (ms)" } }}
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={requestData}>
+                <LineChart data={responseChartData}>
                   <XAxis
                     dataKey="time"
                     stroke="#888888"
@@ -181,7 +212,7 @@ export function RequestMetrics() {
             config={{ count: { color: "#541e6b99", label: "Request Count" } }}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={methodData}>
+              <BarChart data={topRpcMethods}>
                 <XAxis
                   dataKey="name"
                   stroke="#888888"

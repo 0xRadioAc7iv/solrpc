@@ -10,9 +10,7 @@ const config = new Config({
     http: {
       method: "round-robin",
       endpoints: {
-        devnet: [
-          "https://solana-devnet.g.alchemy.com/v2/fFka6FYOxEkfuH7wgc4sfyWncgsHg_yO",
-        ],
+        devnet: ["https://api.devnet.solana.com"],
         mainnet: ["https://api.mainnet-beta.solana.com"],
       },
     },

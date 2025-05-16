@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle2, Clock, Database, Shield } from "lucide-react";
@@ -9,82 +7,16 @@ import { EndpointList } from "@/components/endpoint-list";
 import { StatusOverview } from "@/components/status-overview";
 import { RequestMetrics } from "@/components/request-metrics";
 import SearchBar from "@/components/SearchBar";
-import { Endpoint } from "@/types/dashboard";
-
-import {
-  getEndpoints,
-  getRequestRates,
-  getResponseLatency,
-} from "@/lib/dashboard";
+import { useStatsStore } from "@/lib/store";
 
 export default function Home() {
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
-  const [activeCount, setActiveCount] = useState(0);
-  const [inactiveCount, setInactiveCount] = useState(0);
-  const [successRate, setSuccessRate] = useState("0%");
-  const [responseLatency, setResponseLatency] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [endpointsRes, ratesRes, latencyRes] = await Promise.all([
-          getEndpoints(),
-          getRequestRates(),
-          getResponseLatency(),
-        ]);
-
-        const transformedEndpoints: Endpoint[] = endpointsRes.data.map(
-          (ep: { url: string; status?: string; latency?: number; weight?: number; active?: boolean }, idx: number) => ({
-            id: `${idx}`,
-            url: ep.url,
-            type: "Public", 
-            network: "Mainnet-Beta", 
-            status: ep.status || "Online", 
-            latency: ep.latency || 0,
-            weight: ep.weight || 1,
-            enabled: ep.active ?? true, 
-          })
-        );
-
-        setEndpoints(transformedEndpoints);
-
-        const active = transformedEndpoints.filter((ep) => ep.enabled).length;
-        const inactive = transformedEndpoints.length - active;
-        setActiveCount(active);
-        setInactiveCount(inactive);
-
-        const rawSuccessRate = Number(ratesRes.data.successRate);
-        setSuccessRate(isNaN(rawSuccessRate) ? "0%" : `${rawSuccessRate}%`);
-
-        const latencies = latencyRes.data;
-        if (Array.isArray(latencies) && latencies.length > 0) {
-          const avgLatency = (
-            latencies.reduce((a: number, b: number) => a + b, 0) /
-            latencies.length
-          ).toFixed(2);
-          setResponseLatency(Number(avgLatency));
-        } else {
-          setResponseLatency(0);
-        }
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-[#050816] text-white">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mr-3" />
-        <span>Loading dashboard...</span>
-      </div>
-    );
-  }
+  const {
+    config,
+    endpoints,
+    requestSuccessRate,
+    responseLatencies,
+    endpointsData,
+  } = useStatsStore();
 
   return (
     <div className="border border-black text-white pt-16 bg-[#050816] px-6">
@@ -107,9 +39,22 @@ export default function Home() {
             <Database className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold">{endpoints.length}</div>
+            <div className="text-lg font-bold">
+              {config?.network === "devnet"
+                ? endpoints?.devnet.length
+                : endpoints?.mainnet.length}
+            </div>
             <p className="text-sm">
-              {activeCount} active, {inactiveCount} inactive
+              {endpointsData.reduce(
+                (sum, endpoint) => (endpoint.value.isActive ? sum + 1 : sum),
+                0
+              )}
+              active,{" "}
+              {endpointsData.reduce(
+                (sum, endpoint) => (!endpoint.value.isActive ? sum + 1 : sum),
+                0
+              )}{" "}
+              inactive
             </p>
           </CardContent>
         </Card>
@@ -120,7 +65,9 @@ export default function Home() {
             <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold">{successRate}</div>
+            <div className="text-lg font-bold">
+              {requestSuccessRate > 0 ? requestSuccessRate : 0}
+            </div>
             <p className="text-sm">Latest aggregated rate</p>
           </CardContent>
         </Card>
@@ -133,7 +80,17 @@ export default function Home() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold">{responseLatency}ms</div>
+            <div className="text-lg font-bold">
+              {responseLatencies.length > 0
+                ? (
+                    responseLatencies.reduce(
+                      (sum, item) => sum + item.latency,
+                      0
+                    ) / responseLatencies.length
+                  ).toFixed(2)
+                : 0}
+              ms
+            </div>
             <p className="text-sm">Based on recent data</p>
           </CardContent>
         </Card>
@@ -164,7 +121,7 @@ export default function Home() {
         </TabsContent>
 
         <TabsContent value="endpoints" className="space-y-4">
-          <EndpointList endpoints={endpoints} />
+          {/* <EndpointList endpoints={endpoints} /> */}
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-4">

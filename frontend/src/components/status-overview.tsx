@@ -16,8 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useStatsStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 export function StatusOverview() {
+  const { config } = useStatsStore();
+
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
@@ -40,25 +44,49 @@ export function StatusOverview() {
           <CardHeader>
             <CardTitle className="text-base">Load Balancing</CardTitle>
             <CardDescription>
-              Current algorithm: Least Response Time
+              Current algorithm:{" "}
+              {config?.balancingOptions.http.method.replace("-", " ")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className={"h-5 w-5 text-green-500"} />
                   <span>Round-Robin</span>
                 </div>
-                <Badge className="available font-normal inter">Available</Badge>
+                <Badge
+                  className={cn(
+                    `${
+                      config?.balancingOptions.http.method === "round-robin"
+                        ? "active"
+                        : "available"
+                    } font-normal inter`
+                  )}
+                >
+                  {config?.balancingOptions.http.method === "round-robin"
+                    ? "Active"
+                    : "Available"}
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>Least Connections</span>
                 </div>
-                <Badge className="available font-normal inter ">
-                  Available
+                <Badge
+                  className={cn(
+                    `${
+                      config?.balancingOptions.http.method ===
+                      "least-connections"
+                        ? "active"
+                        : "available"
+                    } font-normal inter`
+                  )}
+                >
+                  {config?.balancingOptions.http.method === "least-connections"
+                    ? "Active"
+                    : "Available"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
@@ -66,14 +94,38 @@ export function StatusOverview() {
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>Least Response Time</span>
                 </div>
-                <Badge className="active font-normal">Active</Badge>
+                <Badge
+                  className={cn(
+                    `${
+                      config?.balancingOptions.http.method === "least-latency"
+                        ? "active"
+                        : "available"
+                    } font-normal inter`
+                  )}
+                >
+                  {config?.balancingOptions.http.method === "least-latency"
+                    ? "Active"
+                    : "Available"}
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>Weighted</span>
                 </div>
-                <Badge className="available font-normal inter">Available</Badge>
+                <Badge
+                  className={cn(
+                    `${
+                      config?.balancingOptions.http.method === "weighted"
+                        ? "active"
+                        : "available"
+                    } font-normal inter`
+                  )}
+                >
+                  {config?.balancingOptions.http.method === "weighted"
+                    ? "Active"
+                    : "Available"}
+                </Badge>
               </div>
             </div>
           </CardContent>
@@ -82,7 +134,9 @@ export function StatusOverview() {
         <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20  text-white">
           <CardHeader>
             <CardTitle className="text-base">Caching Status</CardTitle>
-            <CardDescription>Current method: In-Memory</CardDescription>
+            <CardDescription>
+              Current method: {config?.cachingMethod.type}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -91,15 +145,33 @@ export function StatusOverview() {
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <span>In-Memory</span>
                 </div>
-                <Badge className="active">Active</Badge>
+                <Badge
+                  className={
+                    config?.cachingMethod.type === "memory"
+                      ? "active"
+                      : "memcached"
+                  }
+                >
+                  {config?.cachingMethod.type === "memory"
+                    ? "Active"
+                    : "Disabled"}
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-yellow-500" />
                   <span>Redis</span>
                 </div>
-                <Badge className="text-white not-configured">
-                  Not Configured
+                <Badge
+                  className={
+                    config?.cachingMethod.type === "redis"
+                      ? "active"
+                      : "memcached"
+                  }
+                >
+                  {config?.cachingMethod.type === "redis"
+                    ? "Active"
+                    : "Disabled"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
@@ -107,8 +179,16 @@ export function StatusOverview() {
                   <XCircle className="h-5 w-5 text-red-500" />
                   <span>Memcached</span>
                 </div>
-                <Badge className="text-white memcached">
-                  Disabled
+                <Badge
+                  className={
+                    config?.cachingMethod.type === "memcached"
+                      ? "active"
+                      : "memcached"
+                  }
+                >
+                  {config?.cachingMethod.type === "memcached"
+                    ? "Active"
+                    : "Disabled"}
                 </Badge>
               </div>
             </div>
