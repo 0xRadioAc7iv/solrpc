@@ -120,6 +120,10 @@ export const useStatsStore = create<StatsStore>()(
         }
       },
 
+      clearLogs: () => {
+        set({ logs: [] });
+      },
+
       updateConfig: async (config) => {
         const { serverURL } = get();
 

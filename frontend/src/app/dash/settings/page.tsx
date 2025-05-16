@@ -1,10 +1,6 @@
-// Merged final SettingsPage including Load Balancing tabs
-// Combines General, Advanced, and Load Balancing configurations
-
 "use client";
 
 import { useState } from "react";
-import SearchBar from "@/components/SearchBar";
 import {
   Card,
   CardContent,
@@ -13,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -26,15 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  AlertCircle,
-  CheckCircle,
-  Database,
-  Info,
-  Save,
-  Server,
-  SettingsIcon,
-} from "lucide-react";
+import { AlertCircle, Coins, Save, Server, SettingsIcon } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -43,15 +30,112 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import {
+  CachingMethods,
+  ConfigOptions,
+  HttpConfig,
+  LoadBalancingMethods,
+  NetworkOptions,
+  SimpleEndpoint,
+  SimpleEndpointRecord,
+  WeightedEndpoint,
+  WeightedEndpointRecord,
+} from "@/types/store";
+import { useStatsStore } from "@/lib/store";
 
 export default function SettingsPage() {
   const [loadBalancingEnabled, setLoadBalancingEnabled] = useState(true);
   const [healthCheckInterval, setHealthCheckInterval] = useState(30);
-  const [algorithm, setAlgorithm] = useState("round-robin");
+  const [algorithm, setAlgorithm] =
+    useState<LoadBalancingMethods>("round-robin");
+
+  const { config, updateConfig } = useStatsStore();
+
+  const [formState, setFormState] = useState<ConfigOptions>({
+    network: config?.network!,
+    balancingOptions: config?.balancingOptions!,
+    cachingMethod: config?.cachingMethod!,
+  });
+
+  const handleUpdateNetwork = async () => {
+    if (config) {
+      const newConfig: ConfigOptions = {
+        ...config,
+        network: formState.network,
+      };
+
+      await updateConfig(newConfig);
+    }
+  };
+
+  const handleUpdateCacheMethod = async () => {
+    if (config) {
+      const newConfig: ConfigOptions = {
+        ...config,
+        cachingMethod: formState.cachingMethod,
+      };
+
+      await updateConfig(newConfig);
+    }
+  };
+
+  const handleUpdateLoadBalancingMethod = async (
+    newMethod: LoadBalancingMethods
+  ) => {
+    if (!config) return;
+
+    const prevHttp = config.balancingOptions.http;
+    const isWeighted = newMethod === "weighted";
+
+    let newHttp: HttpConfig;
+
+    if (isWeighted) {
+      const convert = (eps: SimpleEndpoint[]) =>
+        eps.map((url) => ({ url, weight: 1 }));
+
+      const endpoints: WeightedEndpointRecord = {
+        devnet: convert(
+          (prevHttp.endpoints as SimpleEndpointRecord).devnet || []
+        ),
+        mainnet: convert(
+          (prevHttp.endpoints as SimpleEndpointRecord).mainnet || []
+        ),
+      };
+
+      newHttp = {
+        method: "weighted",
+        endpoints,
+      };
+    } else {
+      const flatten = (eps: WeightedEndpoint[]) => eps.map((e) => e.url);
+
+      const endpoints: SimpleEndpointRecord = {
+        devnet: flatten(
+          (prevHttp.endpoints as WeightedEndpointRecord).devnet || []
+        ),
+        mainnet: flatten(
+          (prevHttp.endpoints as WeightedEndpointRecord).mainnet || []
+        ),
+      };
+
+      newHttp = {
+        method: newMethod,
+        endpoints,
+      };
+    }
+
+    const newConfig: ConfigOptions = {
+      ...config,
+      balancingOptions: {
+        http: newHttp,
+      },
+    };
+
+    await updateConfig(newConfig);
+  };
 
   return (
-    <div className="space-y-6 text-white bg-[#050816] px-6 pt-16">
-      <SearchBar />
+    <div className="space-y-6 text-white bg-[#050816] px-6 pt-4">
       <div>
         <h1 className="text-2xl font-normal tracking-tight inter mt-3">
           Settings
@@ -83,9 +167,7 @@ export default function SettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        {/* GENERAL SETTINGS */}
         <TabsContent value="general" className="space-y-4">
-          {/* General Settings Card */}
           <Card className="text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20">
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -99,17 +181,16 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="instance-name">Instance Name</Label>
-                  <Input
-                    id="instance-name"
-                    className="border border-gray-200"
-                    defaultValue="SolRPC Aggregator"
-                  />
-                </div>
-
-                <div className="grid gap-2">
                   <Label htmlFor="default-network">Default Network</Label>
-                  <Select defaultValue="mainnet">
+                  <Select
+                    value={config?.network}
+                    onValueChange={(value) =>
+                      setFormState((prev) => ({
+                        ...prev,
+                        network: value as NetworkOptions,
+                      }))
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select network" />
                     </SelectTrigger>
@@ -120,7 +201,6 @@ export default function SettingsPage() {
                   </Select>
                 </div>
               </div>
-
               <Button className="custom-get-started-button">
                 <Save className="mr-2 h-4 w-4" />
                 Save Settings
@@ -128,7 +208,6 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Cache Settings Card */}
           <Card className="text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20">
             <CardHeader>
               <CardTitle>Cache Settings</CardTitle>
@@ -137,48 +216,26 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="enable-cache">Enable Caching</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Cache RPC responses to improve performance
-                  </p>
-                </div>
-                <Switch id="enable-cache" defaultChecked />
-              </div>
-
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="cache-ttl">Cache TTL</Label>
-                  <span className="text-sm">30 seconds</span>
-                </div>
-                <Slider
-                  id="cache-ttl"
-                  defaultValue={[30]}
-                  max={300}
-                  step={5}
-                  className="py-4"
-                />
-                <p className="text-sm text-muted-foreground">
-                  Time to live for cached responses
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="cacheable-methods">Cacheable Methods</Label>
-                <Select defaultValue="read-only">
+                <Label htmlFor="cacheable-methods">Caching Method</Label>
+                <Select
+                  value={formState.cachingMethod as unknown as string}
+                  onValueChange={(value) =>
+                    setFormState((prev) => ({
+                      ...prev,
+                      cachingMethod: value as unknown as CachingMethods,
+                    }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select methods" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="read-only">Read-only Methods</SelectItem>
-                    <SelectItem value="all">All Methods</SelectItem>
-                    <SelectItem value="custom">Custom Selection</SelectItem>
+                    <SelectItem value="read-only">In-Memory</SelectItem>
+                    <SelectItem value="all">Redis</SelectItem>
+                    <SelectItem value="custom">Memcached</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-muted-foreground">
-                  Which RPC methods should be cached
-                </p>
               </div>
 
               <Button className="custom-get-started-button">
@@ -190,7 +247,6 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="advanced" className="space-y-4">
-          {/* Advanced Settings Card */}
           <Card className="text-white bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20">
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -217,25 +273,6 @@ export default function SettingsPage() {
                 />
                 <p className="text-sm text-muted-foreground">
                   Maximum time to wait for RPC responses
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="concurrency">Max Concurrency</Label>
-                <Select defaultValue="100">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select concurrency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="50">50 requests</SelectItem>
-                    <SelectItem value="100">100 requests</SelectItem>
-                    <SelectItem value="250">250 requests</SelectItem>
-                    <SelectItem value="500">500 requests</SelectItem>
-                    <SelectItem value="1000">1000 requests</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  Maximum concurrent requests to process
                 </p>
               </div>
 
@@ -284,93 +321,8 @@ export default function SettingsPage() {
               </Button>
             </CardContent>
           </Card>
-
-          {/* Database Settings Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Database className="mr-2 h-5 w-5" />
-                Database Settings
-              </CardTitle>
-              <CardDescription>
-                Configure database connection and storage settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="db-type">Database Type</Label>
-                  <Select defaultValue="postgres">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select database type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="postgres">PostgreSQL</SelectItem>
-                      <SelectItem value="mysql">MySQL</SelectItem>
-                      <SelectItem value="mongodb">MongoDB</SelectItem>
-                      <SelectItem value="sqlite">SQLite</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="db-host">Database Host</Label>
-                  <Input id="db-host" defaultValue="localhost" />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="db-port">Database Port</Label>
-                  <Input id="db-port" defaultValue="5432" />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="db-name">Database Name</Label>
-                  <Input id="db-name" defaultValue="solrpc" />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="db-user">Database User</Label>
-                  <Input id="db-user" defaultValue="solrpc_user" />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="db-backup">Automatic Backups</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Enable automatic database backups
-                  </p>
-                </div>
-                <Switch id="db-backup" defaultChecked />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="backup-frequency">Backup Frequency</Label>
-                <Select defaultValue="daily">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select frequency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hourly">Hourly</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  How often to create database backups
-                </p>
-              </div>
-
-              <Button>
-                <Save className="mr-2 h-4 w-4" />
-                Save Database Settings
-              </Button>
-            </CardContent>
-          </Card>
         </TabsContent>
 
-        {/* LOAD BALANCING */}
         <TabsContent value="load-balancing" className="space-y-2">
           <Tabs
             defaultValue="settings"
@@ -388,7 +340,6 @@ export default function SettingsPage() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Settings Tab */}
             <TabsContent value="settings" className="space-y-4">
               <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
                 <CardHeader className="px-4 sm:px-6">
@@ -417,7 +368,10 @@ export default function SettingsPage() {
 
                   <div className="space-y-2">
                     <h3 className="font-medium">Load Balancing Algorithm</h3>
-                    <Select value={algorithm} onValueChange={setAlgorithm}>
+                    <Select
+                      value={algorithm}
+                      onValueChange={() => setAlgorithm(algorithm)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select algorithm" />
                       </SelectTrigger>
@@ -439,7 +393,7 @@ export default function SettingsPage() {
                         "Distributes requests based on endpoint capacity weights"}
                       {algorithm === "least-connections" &&
                         "Routes to endpoint with fewest active connections"}
-                      {algorithm === "response-time" &&
+                      {algorithm === "least-latency" &&
                         "Routes to endpoint with fastest recent response times"}
                     </p>
                   </div>
@@ -477,92 +431,8 @@ export default function SettingsPage() {
                   </Button>
                 </CardContent>
               </Card>
-
-              <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
-                <CardHeader className="px-4 sm:px-6">
-                  <CardTitle className="text-lg sm:text-xl">
-                    Active Endpoints
-                  </CardTitle>
-                  <CardDescription className="text-sm">
-                    Endpoints currently included in the load balancing pool
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="px-4 sm:px-6">
-                  <div className="space-y-4">
-                    {[
-                      {
-                        name: "Mainnet RPC 1",
-                        status: "healthy",
-                        latency: "45ms",
-                        weight: 10,
-                      },
-                      {
-                        name: "Mainnet RPC 2",
-                        status: "healthy",
-                        latency: "62ms",
-                        weight: 8,
-                      },
-                      {
-                        name: "Mainnet RPC 3",
-                        status: "degraded",
-                        latency: "128ms",
-                        weight: 5,
-                      },
-                    ].map((endpoint, i) => (
-                      <div
-                        key={i}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3 last:border-0 last:pb-0"
-                      >
-                        <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h4 className="font-medium">{endpoint.name}</h4>
-                            {endpoint.status === "healthy" ? (
-                              <Badge
-                                className="active text-xs"
-                                variant="secondary"
-                              >
-                                <CheckCircle className="mr-1 h-3 w-3" />
-                                Healthy
-                              </Badge>
-                            ) : (
-                              <Badge
-                                className="available text-xs"
-                                variant="secondary"
-                              >
-                                <Info className="mr-1 h-3 w-3" />
-                                Degraded
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs sm:text-sm text-muted-foreground">
-                            Latency: {endpoint.latency} • Weight:{" "}
-                            {endpoint.weight}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 self-end sm:self-auto">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="bg-gray-900 text-white border border-gray-700 cursor-pointer hover:bg-gray-600 hover:text-slate-500 font-normal text-xs h-8"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-destructive bg-red-200 cursor-pointer font-sans text-xs h-8"
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             </TabsContent>
 
-            {/* Health Checks Tab */}
             <TabsContent value="health" className="space-y-4">
               <Card className="bg-purple-600/2 backdrop-blur-lg shadow-lg border border-purple-800/20 text-white">
                 <CardHeader className="px-4 sm:px-6">

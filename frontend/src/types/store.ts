@@ -66,7 +66,7 @@ type CacheMemcached = { type: "memcached"; url: string };
 
 export type CachingMethods = CacheMemory | CacheRedis | CacheMemcached;
 
-type LoadBalancingMethods =
+export type LoadBalancingMethods =
   | "round-robin"
   | "least-connections"
   | "least-latency"
@@ -233,6 +233,7 @@ export type StatsStore = {
   getRequestRates: () => Promise<void>;
   getResponseLatencies: () => Promise<void>;
 
+  clearLogs: () => void;
   updateConfig: (config: ConfigOptions) => Promise<void>;
 
   fetchAll: () => Promise<void>;

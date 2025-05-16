@@ -75,12 +75,11 @@ const endpointPerformanceData = [
 ];
 
 export default function Analytics() {
-  const { requestData, requestErrorRate, responseLatencies, logs } =
+  const { requestData, requestErrorRate, responseLatencies, logs, clearLogs } =
     useStatsStore();
 
   return (
-    <div className="space-y-6 text-white bg-[#050816] px-6 pt-16">
-      <SearchBar />
+    <div className="space-y-6 text-white bg-[#050816] px-6 pt-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-normal tracking-tight inter mt-3 ">
@@ -590,6 +589,7 @@ export default function Analytics() {
             <Button
               variant="outline"
               className="text-red-600 bg-red-200 border border-red-900"
+              onClick={clearLogs}
             >
               Clear Logs
               <Trash2 className="mr-2 h-4 w-4" />

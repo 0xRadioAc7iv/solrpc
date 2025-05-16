@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { Endpoint, NetworkType } from "@/types/dashboard";
+import { NetworkType } from "@/types/dashboard";
 import { useStatsStore } from "@/lib/store";
 import {
   ConfigOptions,
@@ -31,10 +31,6 @@ import {
   WeightedEndpoint,
   WeightedEndpointRecord,
 } from "@/types/store";
-
-type EndpointFormState = Omit<Endpoint, "id">;
-
-const stringFields: (keyof Pick<EndpointFormState, "url">)[] = ["url"];
 
 export function EndpointList() {
   const { config, endpointsData, updateConfig } = useStatsStore();
