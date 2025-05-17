@@ -14,7 +14,7 @@ export async function initHTTPServer(
   const handler = await handleRequest(options);
 
   await httpServer.register(cors, {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   });
 
